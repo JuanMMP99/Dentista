@@ -1,28 +1,23 @@
 /**
- * ==========================================================================
  * ARCHIVO DE CONFIGURACIÓN CENTRALIZADO (CONFIG.JS)
- * ==========================================================================
- * Edita los valores de este archivo para cambiar la información del sitio
- * sin necesidad de tocar la estructura HTML o los estilos CSS.
  */
-
 const CLINIC_CONFIG = {
     // Info General
-    brandName: "MiCare+",
-    whatsappNumber: "529511234567", // Número sin espacios ni código '+' (Ej: 529511234567)
-    phoneDisplay: "+52 951 123 4567",
-    email: "contacto@micare.com",
+    brandName: "C&H Consultorio Dental",
+    whatsappNumber: "529513298029", // Formato internacional limpio para APIs
+    phoneDisplay: "+52 951 329 8029",
+    email: "contacto@chconsultoriodental.com",
     address: "Av. Principal #123, Col. Centro, Oaxaca, México",
     openingHours: "Lun - Vie: 9:00 AM - 7:00 PM | Sáb: 9:00 AM - 2:00 PM",
-    topPromoText: "Especial Nuevo Paciente: 20% de descuento en tu primera consulta - ¡Agenda Hoy!",
+    topPromoText: "Atención dental personalizada y profesional - ¡Agenda tu cita!",
     
     // SEO & Redes
     websiteUrl: "https://midominio.com",
-    seoDescription: "Atención odontológica integral, estética dental, implantes y ortodoncia con tecnología avanzada en Oaxaca. Agenda tu cita.",
+    seoDescription: "Atención odontológica integral, estética dental y cuidado profesional en C&H Consultorio Dental.",
     socialLinks: {
-        facebook: "https://facebook.com",
-        instagram: "https://instagram.com",
-        twitter: "https://x.com"
+        facebook: "https://www.facebook.com/share/15U7MNqDGC/",
+        instagram: "",
+        twitter: ""
     },
 
     // Textos Principales
@@ -35,13 +30,13 @@ const CLINIC_CONFIG = {
 
     // Estadísticas del contador
     stats: [
-        { number: "15+", label: "Años de Experiencia" },
-        { number: "100+", label: "Dentistas Especialistas" },
-        { number: "20K+", label: "Pacientes Felices" },
-        { number: "24/7", label: "Atención de Urgencias" }
+        { number: "10+", label: "Años de Experiencia" },
+        { number: "100%", label: "Atención Personalizada" },
+        { number: "+1K", label: "Pacientes Satisfechos" },
+        { number: "100%", label: "Higiene & Seguridad" }
     ],
 
-    // Lista de Servicios Dentales
+    // Servicios Dentales
     services: [
         {
             title: "Odontología Estética",
@@ -49,13 +44,13 @@ const CLINIC_CONFIG = {
             image: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=500&q=80"
         },
         {
-            title: "Implantes Dentales",
-            description: "Soluciones permanentes y duraderas para dientes perdidos con aspecto natural.",
+            title: "Limpieza y Prevención",
+            description: "Tratamientos profilácticos para mantener la salud de tus encías y dientes.",
             image: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=500&q=80"
         },
         {
             title: "Ortodoncia",
-            description: "Alinea tus dientes con soluciones modernas e invisibles para todas las edades.",
+            description: "Alineación dental con técnicas modernas adaptadas a cada paciente.",
             image: "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&w=500&q=80"
         },
         {
@@ -65,26 +60,27 @@ const CLINIC_CONFIG = {
         }
     ],
 
-    // Características "¿Por qué elegirnos?"
+    // Características
     features: [
+        { icon: "bi-person-check", title: "Atención Individualizada", desc: "Un especialista dedicado a tu tratamiento de principio a fin." },
         { icon: "bi-cpu", title: "Tecnología Avanzada", desc: "Equipamiento de última generación para diagnósticos precisos." },
-        { icon: "bi-person-badge", title: "Equipo Experto", desc: "Profesionales altamente capacitados y certificados." },
-        { icon: "bi-heart", title: "Máximo Confort", desc: "Tratamientos diseñados para minimizar molestias e incomodidad." },
-        { icon: "bi-shield-check", title: "Atención Accesible", desc: "Planes de pago flexibles y facilidades de financiamiento." }
+        { icon: "bi-heart", title: "Trato Cálido y Humano", desc: "Tratamientos diseñados para minimizar molestias e incomodidad." },
+        { icon: "bi-shield-check", title: "Máxima Higiene", desc: "Protocolos rigurosos de esterilización en cada consulta." }
     ],
 
-    // Equipo Médico (Doctores)
+    // Atención Unipersonal (Un solo especialista)
     doctors: [
-        { name: "Dra. Sarah Johnson", role: "Directora Dental", image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=500&q=80" },
-        { name: "Dr. Michael Chen", role: "Ortodoncista", image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=500&q=80" },
-        { name: "Dra. Emily Rodríguez", role: "Dentista Cosmética", image: "https://images.unsplash.com/photo-1594824813572-980757d5440d?auto=format&fit=crop&w=500&q=80" },
-        { name: "Dr. James Wilson", role: "Cirujano Oral", image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=500&q=80" }
+        { 
+            name: "Especialista C&H Dental", 
+            role: "Cirujano Dentista / Especialista Bucal", 
+            image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=500&q=80" 
+        }
     ],
 
     // Testimonio Destacado
     testimonial: {
-        quote: "MiCare+ transformó por completo mi sonrisa y mi confianza. El equipo médico es increíblemente atento y los resultados superaron mis expectativas.",
-        author: "Jessica Miller",
-        role: "Paciente satisfecha"
+        quote: "C&H Consultorio Dental transformó por completo mi sonrisa. La atención es muy atenta y los resultados superaron mis expectativas.",
+        author: "Paciente Satisfecho",
+        role: "Atención Dental Integral"
     }
 };
