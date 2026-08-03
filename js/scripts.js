@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderFeatures();
   renderDoctors();
   renderSocialLinks();
+  renderLocations();
 
   // 3. Formulario WhatsApp
   initAppointmentForm();
@@ -21,6 +22,85 @@ document.addEventListener("DOMContentLoaded", () => {
   // 4. Inicializar ScrollReveal
   initScrollReveal();
 });
+
+/* --- RENDERIZADO Y MANEJO DE SUCURSALES Y MAPA --- */
+function renderLocations() {
+  const locationsContainer = document.getElementById(
+    "locations-list-container",
+  );
+  const formLocationSelect = document.getElementById("formLocation");
+  const mapTabsContainer = document.getElementById("map-tabs-container");
+  const mapIframe = document.getElementById("interactiveMap");
+
+  if (!CLINIC_CONFIG.locations || CLINIC_CONFIG.locations.length === 0) return;
+
+  // 1. Lista de ubicaciones en la sección de contacto
+  locationsContainer.innerHTML = CLINIC_CONFIG.locations
+    .map(
+      (loc) => `
+        <div class="mb-2">
+            <strong>${loc.name}:</strong>
+            <p class="text-muted small mb-0">${loc.address}</p>
+        </div>
+    `,
+    )
+    .join("");
+
+  // 2. Opciones del Formulario
+  formLocationSelect.innerHTML = CLINIC_CONFIG.locations
+    .map(
+      (loc) => `
+        <option value="${loc.name}">${loc.name}</option>
+    `,
+    )
+    .join("");
+
+  // 3. Botones para cambiar de mapa dinámicamente
+  mapTabsContainer.innerHTML = CLINIC_CONFIG.locations
+    .map(
+      (loc, index) => `
+        <button type="button" class="btn btn-outline-secondary btn-sm map-tab-btn ${index === 0 ? "active" : ""}" data-map-url="${loc.mapEmbed}">
+            ${loc.name}
+        </button>
+    `,
+    )
+    .join("");
+
+  // Inicializar iframe con el primer mapa
+  mapIframe.src = CLINIC_CONFIG.locations[0].mapEmbed;
+
+  // Listener para cambiar el mapa al hacer clic en los botones
+  const tabs = mapTabsContainer.querySelectorAll(".map-tab-btn");
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", function () {
+      tabs.forEach((t) => t.classList.remove("active"));
+      this.classList.add("active");
+      mapIframe.src = this.getAttribute("data-map-url");
+    });
+  });
+}
+
+/* --- FORMULARIO DE CITAS A WHATSAPP --- */
+function initAppointmentForm() {
+  const form = document.getElementById("appointmentForm");
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById("formName").value;
+    const phone = document.getElementById("formPhone").value;
+    const location = document.getElementById("formLocation").value;
+    const service = document.getElementById("formService").value;
+    const message = document.getElementById("formMessage").value;
+
+    const text = `Hola, mi nombre es ${name}. Mi número es ${phone}. Me gustaría agendar una cita en la *${location}* para el servicio de *${service}*. ${message ? "Nota: " + message : ""}`;
+    const encodedText = encodeURIComponent(text);
+
+    window.open(
+      `https://wa.me/${CLINIC_CONFIG.whatsappNumber}?text=${encodedText}`,
+      "_blank",
+    );
+  });
+}
 
 /* --- POBLADO DE INFORMACIÓN GENERAL Y SEO --- */
 function populateGeneralInfo() {

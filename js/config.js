@@ -7,10 +7,31 @@ const CLINIC_CONFIG = {
     whatsappNumber: "529513298029", // Formato internacional limpio para APIs
     phoneDisplay: "+52 951 329 8029",
     email: "contacto@chconsultoriodental.com",
-    address: "Av. Principal #123, Col. Centro, Oaxaca, México",
     openingHours: "Lun - Vie: 9:00 AM - 7:00 PM | Sáb: 9:00 AM - 2:00 PM",
     topPromoText: "Atención dental personalizada y profesional - ¡Agenda tu cita!",
     
+    // Sucursales / Ubicaciones
+    locations: [
+        {
+            id: "sucursal-1",
+            name: "Sucursal Central / Principal",
+            address: "Av. Principal #123, Col. Centro, Oaxaca, México",
+            mapEmbed: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d30568.99090602719!2d-96.69767651306348!3d16.720670446465892!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85c743468b75df0f%3A0xcf3cd33842a30382!2sC%26H%20Dental!5e0!3m2!1ses!2smx!4v1785601450307!5m2!1ses!2smx"
+        },
+        {
+            id: "sucursal-2",
+            name: "Sucursal San Antonino Castillo Velasco",
+            address: "Hidalgo 23, 2da Secc, 71520 San Antonino Castillo Velasco, Oax.",
+            mapEmbed: "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3819.491026514602!2d-96.68339230120182!3d16.801979487771188!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85c740a04432c7b1%3A0x98457af1f3b4f699!2sHidalgo%2023%2C%202da%20Secc%2C%2071520%20San%20Antonino%20Castillo%20Velasco%2C%20Oax.!5e0!3m2!1ses!2smx!4v1785783061990!5m2!1ses!2smx"
+        },
+        {
+            id: "sucursal-3",
+            name: "Sucursal San Jerónimo Taviche (Dentifarmacia)",
+            address: "Supermanzana Ocotlan, 71545 San Jerónimo Taviche, Oax.",
+            mapEmbed: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3821.26206113676!2d-96.5957799250812!3d16.71377108406313!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85c747c4038e7b65%3A0xe1740fa50a0d61e!2sDENTIFARMACIA!5e0!3m2!1ses!2smx!4v1785783110041!5m2!1ses!2smx"
+        }
+    ],
+
     // SEO & Redes
     websiteUrl: "https://midominio.com",
     seoDescription: "Atención odontológica integral, estética dental y cuidado profesional en C&H Consultorio Dental.",
@@ -31,7 +52,7 @@ const CLINIC_CONFIG = {
     // Estadísticas del contador
     stats: [
         { number: "10+", label: "Años de Experiencia" },
-        { number: "100%", label: "Atención Personalizada" },
+        { number: "3", label: "Sucursales a tu Servicio" },
         { number: "+1K", label: "Pacientes Satisfechos" },
         { number: "100%", label: "Higiene & Seguridad" }
     ],
