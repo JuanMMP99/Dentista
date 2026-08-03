@@ -7,6 +7,7 @@ const CLINIC_CONFIG = {
     whatsappNumber: "529513298029", // Formato internacional limpio para APIs
     phoneDisplay: "+52 951 329 8029",
     email: "contacto@chconsultoriodental.com",
+    address: "Magdalena Ocotlán, 71529 Magdalena Ocotlán, Oax.",
     openingHours: "Lun - Vie: 9:00 AM - 7:00 PM | Sáb: 9:00 AM - 2:00 PM",
     topPromoText: "Atención dental personalizada y profesional - ¡Agenda tu cita!",
     
@@ -14,9 +15,9 @@ const CLINIC_CONFIG = {
     locations: [
         {
             id: "sucursal-1",
-            name: "Sucursal Central / Principal",
-            address: "Av. Principal #123, Col. Centro, Oaxaca, México",
-            mapEmbed: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d30568.99090602719!2d-96.69767651306348!3d16.720670446465892!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85c743468b75df0f%3A0xcf3cd33842a30382!2sC%26H%20Dental!5e0!3m2!1ses!2smx!4v1785601450307!5m2!1ses!2smx"
+            name: "Sucursal Principal (Magdalena Ocotlán)",
+            address: "Magdalena Ocotlán, 71529 Magdalena Ocotlán, Oax.",
+            mapEmbed: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3821.4022882815266!2d-96.70966062508141!3d16.706767584068917!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85c743468b75df0f%3A0xcf3cd33842a30382!2sC%26H%20Dental!5e0!3m2!1ses!2smx!4v1785783472413!5m2!1ses!2smx"
         },
         {
             id: "sucursal-2",
