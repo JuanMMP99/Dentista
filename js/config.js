@@ -4,12 +4,15 @@
 const CLINIC_CONFIG = {
     // Info General
     brandName: "C&H Consultorio Dental",
-    whatsappNumber: "529513298029", // Formato internacional limpio para APIs
+    whatsappNumber: "529513298029",
     phoneDisplay: "+52 951 329 8029",
     email: "contacto@chconsultoriodental.com",
     address: "Magdalena Ocotlán, 71529 Magdalena Ocotlán, Oax.",
     openingHours: "Lun - Vie: 9:00 AM - 7:00 PM | Sáb: 9:00 AM - 2:00 PM",
     topPromoText: "Atención dental personalizada y profesional - ¡Agenda tu cita!",
+    
+    // URL de Google Apps Script (REEMPLAZAR CON TU URL)
+    API_URL: 'https://script.google.com/macros/s/AKfycbwk_Ch8BPqGOr47Fc58JRzjB2VEoPWK6-iuH-sj8R77ORS69_p2W--vKuOUuIPYLReb/exec',
     
     // Sucursales / Ubicaciones
     locations: [
@@ -31,6 +34,14 @@ const CLINIC_CONFIG = {
             address: "Supermanzana Ocotlan, 71545 San Jerónimo Taviche, Oax.",
             mapEmbed: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3821.26206113676!2d-96.5957799250812!3d16.71377108406313!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85c747c4038e7b65%3A0xe1740fa50a0d61e!2sDENTIFARMACIA!5e0!3m2!1ses!2smx!4v1785783110041!5m2!1ses!2smx"
         }
+    ],
+
+    // Horarios de atención por sucursal (intervalos de 30 minutos)
+    timeSlots: [
+        '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+        '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
+        '15:00', '15:30', '16:00', '16:30', '17:00', '17:30',
+        '18:00', '18:30'
     ],
 
     // SEO & Redes
@@ -90,7 +101,7 @@ const CLINIC_CONFIG = {
         { icon: "bi-shield-check", title: "Máxima Higiene", desc: "Protocolos rigurosos de esterilización en cada consulta." }
     ],
 
-    // Atención Unipersonal (Un solo especialista)
+    // Atención Unipersonal
     doctors: [
         { 
             name: "Especialista C&H Dental", 
