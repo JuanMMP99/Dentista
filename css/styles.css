@@ -374,3 +374,222 @@ footer a:hover {
     padding: 12px;
     background: #FFFFFF;
 }
+
+/* ==========================================================================
+   HONEYPOT ANTI-SPAM (invisible para personas, visible para bots)
+   ========================================================================== */
+.hp-field {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+/* ==========================================================================
+   WIZARD DE CITAS - INDICADOR DE PASOS
+   ========================================================================== */
+.booking-steps {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.booking-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    position: relative;
+    color: var(--text-muted);
+}
+
+.booking-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 55%;
+    width: 90%;
+    height: 2px;
+    background: #E2E8F0;
+    z-index: 0;
+}
+
+.booking-step.completed:not(:last-child)::after {
+    background: var(--primary-color);
+}
+
+.step-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #F1F5F9;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    position: relative;
+    z-index: 1;
+    transition: all 0.25s ease;
+}
+
+.booking-step.active .step-num {
+    background: var(--primary-color);
+    color: #FFFFFF;
+}
+
+.booking-step.completed .step-num {
+    background: var(--primary-hover);
+    color: #FFFFFF;
+}
+
+.step-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.booking-step.active .step-label {
+    color: var(--secondary-color);
+}
+
+/* ==========================================================================
+   SELECTOR VISUAL DE HORARIOS
+   ========================================================================== */
+.time-slot-grid {
+    min-height: 40px;
+}
+
+.time-slot-group {
+    margin-bottom: 12px;
+}
+
+.time-slot-group-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 8px;
+}
+
+.time-slot-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.time-slot-btn {
+    border: 2px solid #E2E8F0;
+    background: #FFFFFF;
+    color: var(--text-dark);
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.time-slot-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.time-slot-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #FFFFFF;
+}
+
+/* ==========================================================================
+   RESUMEN DE CITA (PASO 3)
+   ========================================================================== */
+.booking-summary {
+    background: var(--accent-bg);
+    border: 1px solid #CCFBF1;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.booking-summary-title {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    margin-bottom: 10px;
+}
+
+.booking-summary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+}
+
+.booking-summary-list i {
+    color: var(--primary-color);
+    width: 18px;
+}
+
+/* ==========================================================================
+   TESTIMONIOS - PUNTOS DE NAVEGACIÓN
+   ========================================================================== */
+.testimonial-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.testimonial-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.testimonial-dot.active {
+    background: var(--primary-color);
+    width: 22px;
+    border-radius: 5px;
+}
+
+/* ==========================================================================
+   FAQ - ACORDEÓN
+   ========================================================================== */
+.faq-item {
+    border: 1px solid #E2E8F0;
+    border-radius: 12px !important;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.faq-item .accordion-button {
+    font-weight: 700;
+    color: var(--secondary-color);
+    background: #FFFFFF;
+}
+
+.faq-item .accordion-button:not(.collapsed) {
+    background: var(--accent-bg);
+    color: var(--primary-hover);
+    box-shadow: none;
+}
+
+.faq-item .accordion-button:focus {
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+}
+
+.faq-item .accordion-button::after {
+    filter: hue-rotate(140deg);
+}

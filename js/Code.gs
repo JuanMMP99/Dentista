@@ -13,12 +13,113 @@ const TIME_SLOTS = [
     '18:00', '18:30'
 ];
 
+// Límites de longitud para evitar abuso desde el formulario público
+const FIELD_LIMITS = {
+    paciente: 100,
+    telefono: 20,
+    sucursal: 150,
+    servicio: 150,
+    notas: 500
+};
+
+// Ventana de tiempo (minutos) para bloquear solicitudes duplicadas del mismo teléfono
+const RATE_LIMIT_MINUTES = 5;
+
+/**
+ * Sanea un valor antes de escribirlo en la hoja:
+ * - Convierte a texto y recorta espacios
+ * - Antepone un apóstrofe si el valor empieza con =, +, -, @ para evitar
+ *   inyección de fórmulas (CSV/formula injection) al abrir la hoja en Excel/Sheets
+ * - Trunca a una longitud máxima
+ */
+function sanitizeForSheet(value, maxLength) {
+    if (value === null || value === undefined) return '';
+    let str = String(value).trim();
+    if (/^[=+\-@]/.test(str)) {
+        str = "'" + str;
+    }
+    if (maxLength && str.length > maxLength) {
+        str = str.substring(0, maxLength);
+    }
+    return str;
+}
+
+/**
+ * Valida que un teléfono tenga entre 10 y 15 dígitos (solo números)
+ */
+function isValidPhone(telefono) {
+    const digits = String(telefono || '').replace(/\D/g, '');
+    return digits.length >= 10 && digits.length <= 15;
+}
+
+/**
+ * Revisa si ya existe una solicitud reciente del mismo teléfono
+ * (protección básica anti-spam / doble envío accidental)
+ */
+function hasRecentDuplicateRequest(telefono) {
+    const sheet = getSheet();
+    const values = sheet.getDataRange().getValues();
+    const digits = String(telefono || '').replace(/\D/g, '');
+    const cutoff = new Date(Date.now() - RATE_LIMIT_MINUTES * 60 * 1000);
+
+    for (let i = values.length - 1; i >= 1; i--) {
+        const rowPhoneDigits = String(values[i][1] || '').replace(/\D/g, '');
+        const rowTimestamp = values[i][8];
+        if (rowPhoneDigits && rowPhoneDigits === digits && rowTimestamp) {
+            const ts = new Date(rowTimestamp);
+            if (!isNaN(ts.getTime()) && ts > cutoff) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+/**
+ * Normaliza cualquier valor de fecha al formato YYYY-MM-DD
+ */
+function normalizeDate(val) {
+    if (!val) return '';
+    if (val instanceof Date) {
+        return Utilities.formatDate(val, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+    }
+    const str = String(val).trim();
+    if (str.includes('T')) {
+        return str.split('T')[0];
+    }
+    if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+        return str;
+    }
+    const d = new Date(str);
+    if (!isNaN(d.getTime())) {
+        return Utilities.formatDate(d, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+    }
+    return str;
+}
+
+/**
+ * Normaliza cualquier valor de hora al formato HH:mm (ej: "9:00" -> "09:00")
+ */
+function normalizeTime(val) {
+    if (!val) return '';
+    if (val instanceof Date) {
+        return Utilities.formatDate(val, Session.getScriptTimeZone(), 'HH:mm');
+    }
+    let str = String(val).trim();
+    const parts = str.split(':');
+    if (parts.length >= 2) {
+        let h = parts[0].padStart(2, '0');
+        let m = parts[1].padStart(2, '0');
+        return `${h}:${m}`;
+    }
+    return str;
+}
+
 /**
  * Maneja las solicitudes GET
  */
 function doGet(e) {
     try {
-        // Verificar si hay parámetros
         if (!e || !e.parameter) {
             return buildResponse({ 
                 error: 'Solicitud inválida. Se requieren parámetros.',
@@ -28,7 +129,6 @@ function doGet(e) {
 
         const action = e.parameter.action;
         
-        // Si no hay acción especificada, devolver ayuda
         if (!action) {
             return buildResponse({ 
                 message: 'API de Citas funcionando correctamente',
@@ -63,7 +163,6 @@ function doGet(e) {
  */
 function doPost(e) {
     try {
-        // Verificar que haya datos
         if (!e || !e.postData || !e.postData.contents) {
             return buildResponse({ 
                 error: 'Solicitud POST inválida. Se requiere JSON en el cuerpo.'
@@ -105,7 +204,6 @@ function handleGetCitas(e) {
     const fecha = e.parameter.fecha;
     const sucursal = e.parameter.sucursal;
     
-    // Validar parámetros
     if (!fecha) {
         return buildResponse({ error: 'Se requiere el parámetro "fecha"' }, false);
     }
@@ -124,7 +222,6 @@ function handleGetHorariosDisponibles(e) {
     const fecha = e.parameter.fecha;
     const sucursal = e.parameter.sucursal;
     
-    // Validar parámetros
     if (!fecha) {
         return buildResponse({ error: 'Se requiere el parámetro "fecha"' }, false);
     }
@@ -133,14 +230,14 @@ function handleGetHorariosDisponibles(e) {
     }
     
     const citasOcupadas = getCitasFromSheet(fecha, sucursal);
-    const horariosOcupados = citasOcupadas.map(c => c.hora);
+    const horariosOcupados = citasOcupadas.map(c => normalizeTime(c.hora));
     
     const horariosDisponibles = TIME_SLOTS.filter(
-        hora => !horariosOcupados.includes(hora)
+        hora => !horariosOcupados.includes(normalizeTime(hora))
     );
     
     return buildResponse({
-        fecha: fecha,
+        fecha: normalizeDate(fecha),
         sucursal: sucursal,
         disponibles: horariosDisponibles,
         ocupados: horariosOcupados
@@ -151,7 +248,6 @@ function handleGetHorariosDisponibles(e) {
  * Crea una nueva cita
  */
 function handleCrearCita(data) {
-    // Validar datos requeridos
     const required = ['paciente', 'telefono', 'sucursal', 'servicio', 'fecha', 'hora'];
     const missing = required.filter(field => !data[field]);
     
@@ -163,16 +259,38 @@ function handleCrearCita(data) {
         }, false);
     }
     
-    const { paciente, telefono, sucursal, servicio, fecha, hora, notas, estado } = data;
-    
-    // Validar que no haya duplicado
-    const citasExistentes = getCitasFromSheet(fecha, sucursal);
-    if (citasExistentes.some(c => c.hora === hora)) {
+    // Sanear y truncar cada campo antes de usarlo (evita inyección de fórmulas y abuso de longitud)
+    const paciente = sanitizeForSheet(data.paciente, FIELD_LIMITS.paciente);
+    const telefono = sanitizeForSheet(data.telefono, FIELD_LIMITS.telefono);
+    const sucursal = sanitizeForSheet(data.sucursal, FIELD_LIMITS.sucursal);
+    const servicio = sanitizeForSheet(data.servicio, FIELD_LIMITS.servicio);
+    const notas = sanitizeForSheet(data.notas, FIELD_LIMITS.notas);
+    const estado = sanitizeForSheet(data.estado) || 'Pendiente';
+    const fecha = data.fecha;
+    const hora = data.hora;
+
+    if (!isValidPhone(telefono)) {
+        return buildResponse({ error: 'El teléfono debe tener entre 10 y 15 dígitos' }, false);
+    }
+
+    const fechaNorm = normalizeDate(fecha);
+    const horaNorm = normalizeTime(hora);
+
+    // Protección anti-spam: bloquear si el mismo teléfono ya generó una solicitud hace poco
+    if (hasRecentDuplicateRequest(telefono)) {
+        return buildResponse({
+            error: 'Ya recibimos una solicitud reciente con este teléfono. Espera unos minutos antes de intentar de nuevo.'
+        }, false);
+    }
+
+    // Validar que no haya duplicado de horario
+    const citasExistentes = getCitasFromSheet(fechaNorm, sucursal);
+    if (citasExistentes.some(c => normalizeTime(c.hora) === horaNorm)) {
         return buildResponse({ 
-            error: 'Este horario ya está ocupado',
-            fecha: fecha,
+            error: 'Este horario ya está ocupado para la sucursal seleccionada',
+            fecha: fechaNorm,
             sucursal: sucursal,
-            hora: hora
+            hora: horaNorm
         }, false);
     }
     
@@ -182,13 +300,13 @@ function handleCrearCita(data) {
     
     const rowData = [
         paciente,
-        telefono,
+        "'" + telefono, // Anteponer apóstrofe para forzar formato texto
         sucursal,
         servicio,
-        fecha,
-        hora,
-        notas || '',
-        estado || 'Pendiente',
+        fechaNorm,
+        horaNorm,
+        notas,
+        estado,
         new Date().toISOString(),
         Utilities.getUuid()
     ];
@@ -203,43 +321,48 @@ function handleCrearCita(data) {
             telefono,
             sucursal,
             servicio,
-            fecha,
-            hora,
-            notas: notas || '',
-            estado: estado || 'Pendiente'
+            fecha: fechaNorm,
+            hora: horaNorm,
+            notas,
+            estado
         }
     }, true);
 }
 
 /**
- * Obtiene las citas de la hoja de cálculo
+ * Obtiene las citas de la hoja de cálculo con comparación normalizada
  */
 function getCitasFromSheet(fecha, sucursal) {
     const sheet = getSheet();
-    const data = sheet.getDataRange().getValues();
+    const values = sheet.getDataRange().getValues();
+    const displayValues = sheet.getDataRange().getDisplayValues();
     
-    if (data.length < 2) return [];
+    if (values.length < 2) return [];
     
-    // Estructura: [Paciente, Teléfono, Sucursal, Servicio, Fecha, Hora, Notas, Estado, Timestamp, UUID]
+    const targetFecha = normalizeDate(fecha);
+    const targetSucursal = String(sucursal).trim().toLowerCase();
+    
     const citas = [];
     
-    for (let i = 1; i < data.length; i++) {
-        const row = data[i];
-        if (!row[0]) continue; // Saltar filas vacías
+    for (let i = 1; i < values.length; i++) {
+        const rowVal = values[i];
+        const rowDisp = displayValues[i];
         
-        const fechaCita = row[4]; // Columna E (índice 4)
-        const sucursalCita = row[2]; // Columna C (índice 2)
+        if (!rowVal[0] && !rowDisp[0]) continue; // Saltar filas vacías
         
-        if (fechaCita === fecha && sucursalCita === sucursal) {
+        const cellFecha = normalizeDate(rowVal[4] || rowDisp[4]);
+        const cellSucursal = String(rowVal[2] || rowDisp[2]).trim().toLowerCase();
+        
+        if (cellFecha === targetFecha && cellSucursal === targetSucursal) {
             citas.push({
-                paciente: row[0] || '',
-                telefono: row[1] || '',
-                sucursal: row[2] || '',
-                servicio: row[3] || '',
-                fecha: row[4] || '',
-                hora: row[5] || '',
-                notas: row[6] || '',
-                estado: row[7] || 'Pendiente'
+                paciente: String(rowDisp[0] || ''),
+                telefono: String(rowDisp[1] || ''),
+                sucursal: String(rowDisp[2] || ''),
+                servicio: String(rowDisp[3] || ''),
+                fecha: cellFecha,
+                hora: normalizeTime(rowVal[5] || rowDisp[5]),
+                notas: String(rowDisp[6] || ''),
+                estado: String(rowDisp[7] || 'Pendiente')
             });
         }
     }
@@ -256,7 +379,6 @@ function getSheet() {
     
     if (!sheet) {
         sheet = ss.insertSheet(SHEET_NAME);
-        // Crear encabezados
         const headers = [
             'Paciente',
             'Teléfono',
@@ -291,18 +413,15 @@ function buildResponse(data, success = true) {
 
 /**
  * Función de prueba para verificar la conexión
- * Ejecutar manualmente desde el editor de Apps Script
  */
 function testConnection() {
     try {
-        // Verificar que la hoja exista
         const sheet = getSheet();
         const lastRow = sheet.getLastRow();
         
         Logger.log('✅ Conexión exitosa a la hoja de cálculo');
         Logger.log(`📊 Citas registradas: ${lastRow - 1}`);
         
-        // Retornar información
         return buildResponse({ 
             message: 'Conexión exitosa',
             citasRegistradas: lastRow - 1,
@@ -317,28 +436,28 @@ function testConnection() {
 }
 
 /**
- * Limpia citas antiguas (opcional)
- * Ejecutar manualmente desde el editor de Apps Script
+ * Limpia citas antiguas
  */
 function cleanOldAppointments() {
     const sheet = getSheet();
-    const data = sheet.getDataRange().getValues();
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const dataRange = sheet.getDataRange();
+    const values = dataRange.getValues();
+    const displayValues = dataRange.getDisplayValues();
+    
+    const todayStr = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
     
     const rowsToDelete = [];
     
-    for (let i = data.length - 1; i >= 1; i--) {
-        const fechaStr = data[i][4]; // Columna Fecha
-        if (fechaStr) {
-            const fecha = new Date(fechaStr + 'T00:00:00');
-            if (fecha < today) {
+    for (let i = values.length - 1; i >= 1; i--) {
+        const fechaVal = values[i][4] || displayValues[i][4];
+        if (fechaVal) {
+            const fechaNorm = normalizeDate(fechaVal);
+            if (fechaNorm && fechaNorm < todayStr) {
                 rowsToDelete.push(i + 1);
             }
         }
     }
     
-    // Eliminar filas de atrás hacia adelante
     rowsToDelete.sort((a, b) => b - a);
     rowsToDelete.forEach(row => sheet.deleteRow(row));
     
@@ -352,9 +471,7 @@ function cleanOldAppointments() {
 }
 
 /**
- * Función para probar la API desde el navegador
- * Copia esta URL después de desplegar: 
- * https://script.google.com/macros/s/TU_ID/exec?action=testConnection
+ * Obtiene URL de pruebas
  */
 function getTestUrl() {
     const url = ScriptApp.getService().getUrl();

@@ -110,10 +110,46 @@ const CLINIC_CONFIG = {
         }
     ],
 
-    // Testimonio Destacado
-    testimonial: {
-        quote: "C&H Consultorio Dental transformó por completo mi sonrisa. La atención es muy atenta y los resultados superaron mis expectativas.",
-        author: "Paciente Satisfecho",
-        role: "Atención Dental Integral"
-    }
+    // Testimonios Destacados (se muestran en carrusel automático)
+    testimonials: [
+        {
+            quote: "C&H Consultorio Dental transformó por completo mi sonrisa. La atención es muy atenta y los resultados superaron mis expectativas.",
+            author: "Paciente Satisfecho",
+            role: "Atención Dental Integral"
+        },
+        {
+            quote: "Agendé mi cita desde el celular en menos de un minuto y me confirmaron el mismo día. Excelente atención en la sucursal de Ocotlán.",
+            author: "María Fernanda R.",
+            role: "Limpieza y Blanqueamiento"
+        },
+        {
+            quote: "Tenía mucho miedo de ir al dentista, pero el trato fue muy humano y sin dolor. Ahora recomiendo C&H con toda mi familia.",
+            author: "Juan Carlos M.",
+            role: "Ortodoncia"
+        }
+    ],
+
+    // Preguntas Frecuentes (sección de confianza antes de agendar)
+    faqs: [
+        {
+            q: "¿Cómo agendo mi cita?",
+            a: "Puedes usar el formulario de esta página seleccionando sucursal, fecha y horario disponible, o escribirnos directamente por WhatsApp con el botón flotante."
+        },
+        {
+            q: "¿Necesito pagar un anticipo para reservar?",
+            a: "No. Agendar tu cita en línea no requiere ningún pago. El costo del servicio se cubre directamente en el consultorio el día de tu cita."
+        },
+        {
+            q: "¿Puedo cambiar la fecha u hora de mi cita?",
+            a: "Sí, escríbenos por WhatsApp con al menos 24 horas de anticipación indicando tu nombre y la cita que deseas reprogramar."
+        },
+        {
+            q: "¿Qué pasa si llego tarde a mi cita?",
+            a: "Contamos con un margen de tolerancia de 10 minutos. Si sabes que llegarás tarde, avísanos por WhatsApp para ajustar tu horario cuando sea posible."
+        },
+        {
+            q: "¿Todas las sucursales ofrecen los mismos servicios?",
+            a: "Los tratamientos principales están disponibles en las tres sucursales. Si buscas un servicio específico, confírmalo con nosotros por WhatsApp antes de agendar."
+        }
+    ]
 };

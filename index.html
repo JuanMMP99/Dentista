@@ -262,24 +262,12 @@
             <i class="bi bi-quote fs-1" style="color: var(--primary-color)"></i>
             <div class="row justify-content-center">
               <div class="col-lg-8">
-                <div class="text-warning mb-3">
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
+                <div id="testimonials-container">
+                  <!-- Generado dinámicamente desde JS -->
                 </div>
-                <p class="fs-5 italic mb-4 data-testimonial-quote">
-                  "MiCare+ transformó por completo mi sonrisa y mi confianza. El
-                  equipo médico es increíblemente atento y los resultados
-                  superaron mis expectativas."
-                </p>
-                <h4 class="h6 fw-bold mb-0 data-testimonial-author">
-                  Jessica Miller
-                </h4>
-                <small class="text-muted data-testimonial-role"
-                  >Paciente satisfecha</small
-                >
+                <div class="testimonial-dots mt-4" id="testimonials-dots">
+                  <!-- Generado dinámicamente desde JS -->
+                </div>
               </div>
             </div>
           </div>
@@ -348,78 +336,183 @@
                 </div>
               </div>
 
-              <!-- Formulario directo -->
+              <!-- Formulario directo (Wizard de 3 pasos) -->
               <div class="col-lg-6">
                 <div class="bg-white p-4 rounded-4 shadow-sm">
-                  <h3 class="h5 fw-bold mb-3">Formulario de Agendamiento</h3>
-                  <form id="appointmentForm">
-                    <div class="mb-3">
-                      <label class="form-label small fw-bold"
-                        >Nombre Completo</label
-                      >
+                  <h3 class="h5 fw-bold mb-1">Agenda tu Cita en 3 Pasos</h3>
+                  <p class="text-muted small mb-3">
+                    Selecciona sucursal, horario y confirma tus datos.
+                  </p>
+
+                  <!-- Indicador de pasos -->
+                  <div class="booking-steps mb-4" id="bookingSteps">
+                    <div class="booking-step active" data-step-indicator="1">
+                      <span class="step-num">1</span>
+                      <span class="step-label">Sucursal</span>
+                    </div>
+                    <div class="booking-step" data-step-indicator="2">
+                      <span class="step-num">2</span>
+                      <span class="step-label">Horario</span>
+                    </div>
+                    <div class="booking-step" data-step-indicator="3">
+                      <span class="step-num">3</span>
+                      <span class="step-label">Tus Datos</span>
+                    </div>
+                  </div>
+
+                  <form id="appointmentForm" novalidate>
+                    <!-- Campo trampa anti-spam (honeypot): invisible para personas, visible para bots -->
+                    <div class="hp-field" aria-hidden="true">
+                      <label for="formWebsite">Deja este campo vacío</label>
                       <input
                         type="text"
-                        class="form-control"
-                        id="formName"
-                        placeholder="Tu nombre"
-                        required
-                      />
-                    </div>
-                    <div class="mb-3">
-                      <label class="form-label small fw-bold"
-                        >Teléfono / WhatsApp</label
-                      >
-                      <input
-                        type="tel"
-                        class="form-control"
-                        id="formPhone"
-                        placeholder="Tu número de teléfono"
-                        required
+                        id="formWebsite"
+                        name="website"
+                        tabindex="-1"
+                        autocomplete="off"
                       />
                     </div>
 
-                    <!-- Campo Sucursal Seleccionable -->
-                    <div class="mb-3">
-                      <label class="form-label small fw-bold"
-                        >Sucursal para tu Cita</label
-                      >
-                      <select class="form-select" id="formLocation" required>
-                        <!-- Poblado dinámicamente desde JS -->
-                      </select>
+                    <!-- PASO 1: Sucursal y Servicio -->
+                    <div class="booking-panel" data-panel="1">
+                      <div class="mb-3">
+                        <label class="form-label small fw-bold"
+                          >Sucursal para tu Cita</label
+                        >
+                        <select class="form-select" id="formLocation" required>
+                          <!-- Poblado dinámicamente desde JS -->
+                        </select>
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label small fw-bold"
+                          >Servicio de Interés</label
+                        >
+                        <select class="form-select" id="formService" required>
+                          <!-- Poblado dinámicamente desde JS -->
+                        </select>
+                      </div>
+                      <div class="d-flex justify-content-end">
+                        <button
+                          type="button"
+                          class="btn btn-custom-primary"
+                          data-next="2"
+                        >
+                          Continuar <i class="bi bi-arrow-right"></i>
+                        </button>
+                      </div>
                     </div>
 
-                    <div class="mb-3">
-                      <label class="form-label small fw-bold"
-                        >Servicio de Interés</label
-                      >
-                      <select class="form-select" id="formService" required>
+                    <!-- PASO 2: Fecha y Hora -->
+                    <div class="booking-panel d-none" data-panel="2">
+                      <div class="mb-3">
+                        <label class="form-label small fw-bold"
+                          >Fecha de la Cita</label
+                        >
+                        <input
+                          type="date"
+                          class="form-control"
+                          id="formDate"
+                          required
+                        />
+                        <div id="dateValidationMsg" class="small mt-1"></div>
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label small fw-bold"
+                          >Horario Disponible</label
+                        >
+                        <div id="timeSlotGrid" class="time-slot-grid">
+                          <!-- Poblado dinámicamente desde JS -->
+                        </div>
+                        <input type="hidden" id="formTime" required />
+                        <div id="availabilityMessage" class="small mt-2"></div>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <button
+                          type="button"
+                          class="btn btn-custom-outline"
+                          data-prev="1"
+                        >
+                          <i class="bi bi-arrow-left"></i> Atrás
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-custom-primary"
+                          data-next="3"
+                        >
+                          Continuar <i class="bi bi-arrow-right"></i>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- PASO 3: Datos personales y confirmación -->
+                    <div class="booking-panel d-none" data-panel="3">
+                      <div class="mb-3">
+                        <label class="form-label small fw-bold"
+                          >Nombre Completo</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="formName"
+                          placeholder="Tu nombre"
+                          required
+                        />
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label small fw-bold"
+                          >Teléfono / WhatsApp</label
+                        >
+                        <input
+                          type="tel"
+                          class="form-control"
+                          id="formPhone"
+                          placeholder="10 dígitos, ej. 9511234567"
+                          required
+                        />
+                        <div id="phoneValidationMsg" class="small mt-1"></div>
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label small fw-bold"
+                          >Mensaje o Comentario (opcional)</label
+                        >
+                        <textarea
+                          class="form-control"
+                          id="formMessage"
+                          rows="2"
+                          placeholder="Detalles adicionales..."
+                        ></textarea>
+                      </div>
+
+                      <!-- Resumen de la cita -->
+                      <div class="booking-summary mb-3" id="bookingSummary">
                         <!-- Poblado dinámicamente desde JS -->
-                      </select>
-                    </div>
-                    <div class="mb-3">
-                      <label class="form-label small fw-bold"
-                        >Mensaje o Comentario</label
+                      </div>
+
+                      <div
+                        class="d-flex justify-content-between align-items-center flex-wrap gap-2"
                       >
-                      <textarea
-                        class="form-control"
-                        id="formMessage"
-                        rows="2"
-                        placeholder="Detalles adicionales..."
-                      ></textarea>
+                        <button
+                          type="button"
+                          class="btn btn-custom-outline"
+                          data-prev="2"
+                        >
+                          <i class="bi bi-arrow-left"></i> Atrás
+                        </button>
+                        <button
+                          type="submit"
+                          id="submitBtn"
+                          class="btn btn-custom-primary d-flex justify-content-center align-items-center gap-2"
+                        >
+                          <span
+                            id="submitSpinner"
+                            class="spinner-border spinner-border-sm d-none"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
+                          <span id="submitText">Confirmar Cita</span>
+                        </button>
+                      </div>
                     </div>
-                    <button
-                      type="submit"
-                      id="submitBtn"
-                      class="btn btn-custom-primary w-100 justify-content-center align-items-center gap-2"
-                    >
-                      <span
-                        id="submitSpinner"
-                        class="spinner-border spinner-border-sm d-none"
-                        role="status"
-                        aria-hidden="true"
-                      ></span>
-                      <span id="submitText">Enviar Mensaje por WhatsApp</span>
-                    </button>
                   </form>
                 </div>
               </div>
@@ -454,6 +547,25 @@
                   loading="lazy"
                   referrerpolicy="strict-origin-when-cross-origin"
                 ></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ SECTION -->
+      <section class="py-5" id="faq">
+        <div class="container">
+          <div class="text-center mb-5">
+            <h2 class="section-title">Preguntas Frecuentes</h2>
+            <p class="text-muted">
+              Resolvemos tus dudas antes de agendar tu visita.
+            </p>
+          </div>
+          <div class="row justify-content-center">
+            <div class="col-lg-8">
+              <div class="accordion" id="faqAccordion">
+                <!-- Generado dinámicamente desde JS -->
               </div>
             </div>
           </div>

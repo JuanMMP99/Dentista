@@ -15,6 +15,8 @@ document.addEventListener("DOMContentLoaded", () => {
     renderDoctors();
     renderSocialLinks();
     renderLocations();
+    renderTestimonials();
+    renderFAQ();
 
     // 3. Inicializar Sistema de Agenda
     initAppointmentSystem();
@@ -23,20 +25,17 @@ document.addEventListener("DOMContentLoaded", () => {
     initScrollReveal();
 });
 
-/* --- SISTEMA DE AGENDA DE CITAS --- */
+/* --- SISTEMA DE AGENDA DE CITAS (WIZARD DE 3 PASOS) --- */
+let currentBookingStep = 1;
+
 function initAppointmentSystem() {
     const form = document.getElementById('appointmentForm');
-    
-    // Agregar campos de fecha y hora si no existen
-    addDateTimeFields();
-    
-    // Obtener referencias a los campos
     const dateInput = document.getElementById('formDate');
-    const timeSelect = document.getElementById('formTime');
     const locationSelect = document.getElementById('formLocation');
-    
-    if (!dateInput || !timeSelect) {
-        console.error('No se encontraron los campos de fecha y hora');
+    const phoneInput = document.getElementById('formPhone');
+
+    if (!form || !dateInput) {
+        console.error('No se encontró el formulario de citas');
         return;
     }
 
@@ -46,85 +45,127 @@ function initAppointmentSystem() {
     dateInput.setAttribute('min', todayStr);
     dateInput.value = todayStr;
 
-    // Evento para verificar disponibilidad al cambiar fecha o sucursal
-    if (dateInput) {
-        dateInput.addEventListener('change', () => {
-            validateAndCheckAvailability();
+    // Navegación del wizard
+    form.querySelectorAll('[data-next]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const next = parseInt(btn.getAttribute('data-next'), 10);
+            if (validateBookingStep(currentBookingStep)) {
+                goToBookingStep(next);
+            }
         });
-    }
+    });
 
+    form.querySelectorAll('[data-prev]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const prev = parseInt(btn.getAttribute('data-prev'), 10);
+            goToBookingStep(prev);
+        });
+    });
+
+    // Verificar disponibilidad al cambiar fecha
+    dateInput.addEventListener('change', validateAndCheckAvailability);
+
+    // Si cambia la sucursal, refrescamos disponibilidad (por si el usuario regresó al paso 1)
     if (locationSelect) {
         locationSelect.addEventListener('change', () => {
-            validateAndCheckAvailability();
+            if (currentBookingStep === 2) validateAndCheckAvailability();
         });
     }
 
-    // Submit del formulario
-    form.addEventListener('submit', handleAppointmentSubmit);
+    // Validación de teléfono en tiempo real
+    if (phoneInput) {
+        phoneInput.addEventListener('input', validatePhoneField);
+    }
 
-    // Verificar disponibilidad inicial
-    setTimeout(validateAndCheckAvailability, 500);
+    // Submit del formulario (paso 3)
+    form.addEventListener('submit', handleAppointmentSubmit);
 }
 
-function addDateTimeFields() {
+function goToBookingStep(step) {
     const form = document.getElementById('appointmentForm');
-    
-    // Verificar si ya existen los campos
-    if (document.getElementById('formDate')) return;
+    currentBookingStep = step;
 
-    // Encontrar el campo de servicio para insertar después
-    const serviceField = document.getElementById('formService');
-    const locationField = document.getElementById('formLocation');
-    
-    if (!serviceField || !locationField) {
-        console.error('No se encontraron los campos necesarios');
-        return;
+    // Mostrar/ocultar paneles
+    form.querySelectorAll('.booking-panel').forEach((panel) => {
+        panel.classList.toggle('d-none', parseInt(panel.getAttribute('data-panel'), 10) !== step);
+    });
+
+    // Actualizar indicador de pasos
+    document.querySelectorAll('#bookingSteps .booking-step').forEach((el) => {
+        const indicatorStep = parseInt(el.getAttribute('data-step-indicator'), 10);
+        el.classList.toggle('active', indicatorStep === step);
+        el.classList.toggle('completed', indicatorStep < step);
+    });
+
+    if (step === 2) {
+        validateAndCheckAvailability();
     }
 
-    // Crear contenedor para fecha y hora
-    const dateTimeContainer = document.createElement('div');
-    dateTimeContainer.className = 'row g-3 mb-3';
-    dateTimeContainer.innerHTML = `
-        <div class="col-md-6">
-            <label class="form-label small fw-bold">Fecha de la Cita *</label>
-            <input type="date" class="form-control" id="formDate" required />
-            <div id="dateValidationMsg" class="small text-muted mt-1"></div>
-        </div>
-        <div class="col-md-6">
-            <label class="form-label small fw-bold">Hora de la Cita *</label>
-            <select class="form-select" id="formTime" required>
-                <option value="">-- Seleccionar hora --</option>
-            </select>
-            <div id="timeValidationMsg" class="small text-muted mt-1"></div>
-        </div>
-    `;
-
-    // Insertar después del campo de ubicación
-    if (locationField.parentNode) {
-        locationField.parentNode.insertBefore(dateTimeContainer, locationField.nextSibling);
+    if (step === 3) {
+        renderBookingSummary();
     }
 
-    // Agregar campo de disponibilidad
-    const availabilityDiv = document.createElement('div');
-    availabilityDiv.className = 'mb-3';
-    availabilityDiv.innerHTML = `
-        <div id="availabilityMessage" class="small"></div>
-    `;
-    
-    const timeContainer = dateTimeContainer.querySelector('.col-md-6:last-child');
-    if (timeContainer) {
-        timeContainer.appendChild(availabilityDiv.querySelector('#availabilityMessage'));
+    // Llevar el foco al inicio del formulario para accesibilidad
+    const cardTop = document.getElementById('bookingSteps');
+    if (cardTop) cardTop.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function validateBookingStep(step) {
+    if (step === 1) {
+        const location = document.getElementById('formLocation').value;
+        const service = document.getElementById('formService').value;
+        if (!location || !service) {
+            showNotification('Selecciona sucursal y servicio para continuar', 'warning');
+            return false;
+        }
+        return true;
     }
+
+    if (step === 2) {
+        const date = document.getElementById('formDate').value;
+        const time = document.getElementById('formTime').value;
+        if (!date) {
+            showNotification('Selecciona una fecha', 'warning');
+            return false;
+        }
+        if (!time) {
+            showNotification('Selecciona un horario disponible', 'warning');
+            return false;
+        }
+        return true;
+    }
+
+    return true;
+}
+
+function validatePhoneField() {
+    const phoneInput = document.getElementById('formPhone');
+    const msg = document.getElementById('phoneValidationMsg');
+    const digits = phoneInput.value.replace(/\D/g, '');
+
+    if (!digits) {
+        if (msg) msg.innerHTML = '';
+        return false;
+    }
+
+    if (digits.length !== 10) {
+        if (msg) msg.innerHTML = '<span class="text-danger"><i class="bi bi-exclamation-circle"></i> Ingresa un número a 10 dígitos</span>';
+        return false;
+    }
+
+    if (msg) msg.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Número válido</span>';
+    return true;
 }
 
 function validateAndCheckAvailability() {
     const dateInput = document.getElementById('formDate');
-    const timeSelect = document.getElementById('formTime');
     const locationSelect = document.getElementById('formLocation');
     const dateValidationMsg = document.getElementById('dateValidationMsg');
     const availabilityMsg = document.getElementById('availabilityMessage');
+    const slotGrid = document.getElementById('timeSlotGrid');
+    const timeField = document.getElementById('formTime');
 
-    if (!dateInput || !timeSelect || !locationSelect) return;
+    if (!dateInput || !locationSelect) return;
 
     const fecha = dateInput.value;
     const sucursal = locationSelect.value;
@@ -135,37 +176,31 @@ function validateAndCheckAvailability() {
     const selectedDate = new Date(fecha + 'T00:00:00');
 
     if (!fecha) {
-        if (dateValidationMsg) {
-            dateValidationMsg.innerHTML = '<span class="text-warning">⚠️ Selecciona una fecha</span>';
-        }
-        timeSelect.innerHTML = '<option value="">-- Seleccionar hora --</option>';
+        if (dateValidationMsg) dateValidationMsg.innerHTML = '<span class="text-warning">⚠️ Selecciona una fecha</span>';
+        if (slotGrid) slotGrid.innerHTML = '';
+        if (timeField) timeField.value = '';
         if (availabilityMsg) availabilityMsg.innerHTML = '';
         return;
     }
 
     // Validar que la fecha no sea anterior a hoy
     if (selectedDate < new Date(todayStr + 'T00:00:00')) {
-        if (dateValidationMsg) {
-            dateValidationMsg.innerHTML = '<span class="text-danger">❌ No se pueden agendar citas en fechas pasadas</span>';
-        }
-        timeSelect.innerHTML = '<option value="">-- Seleccionar hora --</option>';
+        if (dateValidationMsg) dateValidationMsg.innerHTML = '<span class="text-danger">❌ No se pueden agendar citas en fechas pasadas</span>';
+        if (slotGrid) slotGrid.innerHTML = '';
+        if (timeField) timeField.value = '';
         if (availabilityMsg) availabilityMsg.innerHTML = '';
         return;
     }
 
-    if (dateValidationMsg) {
-        dateValidationMsg.innerHTML = '<span class="text-success">✅ Fecha válida</span>';
-    }
+    if (dateValidationMsg) dateValidationMsg.innerHTML = '<span class="text-success">✅ Fecha válida</span>';
 
     if (!sucursal) {
-        if (availabilityMsg) {
-            availabilityMsg.innerHTML = '<span class="text-warning">⚠️ Selecciona una sucursal</span>';
-        }
-        timeSelect.innerHTML = '<option value="">-- Seleccionar hora --</option>';
+        if (availabilityMsg) availabilityMsg.innerHTML = '<span class="text-warning">⚠️ Selecciona una sucursal en el paso 1</span>';
+        if (slotGrid) slotGrid.innerHTML = '';
+        if (timeField) timeField.value = '';
         return;
     }
 
-    // Verificar disponibilidad
     checkAvailability();
 }
 
@@ -182,21 +217,27 @@ function normalizeTimeStr(timeStr) {
 async function checkAvailability() {
     const dateInput = document.getElementById('formDate');
     const locationSelect = document.getElementById('formLocation');
-    const timeSelect = document.getElementById('formTime');
+    const slotGrid = document.getElementById('timeSlotGrid');
+    const timeField = document.getElementById('formTime');
     const availabilityMsg = document.getElementById('availabilityMessage');
 
-    if (!dateInput || !locationSelect || !timeSelect) return;
+    if (!dateInput || !locationSelect || !slotGrid || !timeField) return;
 
     const fecha = dateInput.value;
     const sucursal = locationSelect.value;
 
     if (!fecha || !sucursal) {
-        timeSelect.innerHTML = '<option value="">-- Seleccionar hora --</option>';
+        slotGrid.innerHTML = '';
+        timeField.value = '';
         if (availabilityMsg) {
             availabilityMsg.innerHTML = '<span class="text-muted">Selecciona fecha y sucursal</span>';
         }
         return;
     }
+
+    // Estado de carga mientras se consulta el Sheet
+    slotGrid.innerHTML = '<span class="text-muted small"><i class="bi bi-arrow-repeat"></i> Cargando horarios...</span>';
+    timeField.value = '';
 
     try {
         const ocupados = await API.getCitas(fecha, sucursal);
@@ -223,14 +264,14 @@ async function checkAvailability() {
             });
         }
 
-        timeSelect.innerHTML = '<option value="">-- Seleccionar hora --</option>';
-        
+        slotGrid.innerHTML = '';
+
         if (horariosDisponibles.length === 0) {
             let mensaje = 'No hay horarios disponibles para esta fecha y sucursal.';
             if (isToday) {
                 mensaje = 'No hay horarios disponibles para el resto del día de hoy.';
             }
-            timeSelect.innerHTML += `<option value="" disabled>${mensaje}</option>`;
+            slotGrid.innerHTML = `<span class="text-muted small">${mensaje}</span>`;
             if (availabilityMsg) {
                 availabilityMsg.innerHTML = `
                     <span class="text-danger">
@@ -242,11 +283,30 @@ async function checkAvailability() {
             return;
         }
 
-        horariosDisponibles.forEach(hora => {
-            const option = document.createElement('option');
-            option.value = hora;
-            option.textContent = hora;
-            timeSelect.appendChild(option);
+        // Agrupar horarios en Mañana / Tarde para facilitar la lectura visual
+        const manana = horariosDisponibles.filter(h => parseInt(h.split(':')[0], 10) < 13);
+        const tarde = horariosDisponibles.filter(h => parseInt(h.split(':')[0], 10) >= 13);
+
+        const buildGroup = (label, horas) => {
+            if (horas.length === 0) return '';
+            return `
+                <div class="time-slot-group">
+                    <span class="time-slot-group-label">${label}</span>
+                    <div class="time-slot-buttons">
+                        ${horas.map(h => `<button type="button" class="time-slot-btn" data-time="${h}">${h}</button>`).join('')}
+                    </div>
+                </div>
+            `;
+        };
+
+        slotGrid.innerHTML = buildGroup('Mañana', manana) + buildGroup('Tarde', tarde);
+
+        slotGrid.querySelectorAll('.time-slot-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                slotGrid.querySelectorAll('.time-slot-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                timeField.value = btn.getAttribute('data-time');
+            });
         });
 
         if (availabilityMsg) {
@@ -277,6 +337,12 @@ async function checkAvailability() {
 async function handleAppointmentSubmit(e) {
     e.preventDefault();
 
+    // Honeypot anti-spam: si un bot llenó este campo invisible, abortamos en silencio
+    const honeypot = document.getElementById('formWebsite');
+    if (honeypot && honeypot.value.trim() !== '') {
+        return;
+    }
+
     const submitBtn = document.getElementById('submitBtn');
     const submitSpinner = document.getElementById('submitSpinner');
     const submitText = document.getElementById('submitText');
@@ -291,15 +357,15 @@ async function handleAppointmentSubmit(e) {
 
     // 1. Validaciones locales previas al envío
     const errors = [];
-    if (!name) errors.push('Nombre completo');
-    if (!phone) errors.push('Teléfono');
+    if (!name || name.length < 3) errors.push('Nombre completo');
+    if (!validatePhoneField()) errors.push('Teléfono (10 dígitos)');
     if (!location) errors.push('Sucursal');
     if (!service) errors.push('Servicio');
     if (!date) errors.push('Fecha');
     if (!time) errors.push('Hora');
 
     if (errors.length > 0) {
-        showNotification(`Por favor completa: ${errors.join(', ')}`, 'warning');
+        showNotification(`Por favor revisa: ${errors.join(', ')}`, 'warning');
         return;
     }
 
@@ -355,13 +421,14 @@ async function handleAppointmentSubmit(e) {
 
         // Notificación y reseteo
         showNotification('¡Cita agendada exitosamente! Te esperamos.', 'success');
+        sendWhatsAppConfirmation(name, phone, location, service, date, time);
+
         document.getElementById('appointmentForm').reset();
-        
         const todayStr2 = new Date().toISOString().split('T')[0];
         document.getElementById('formDate').value = todayStr2;
+        document.getElementById('timeSlotGrid').innerHTML = '';
 
-        validateAndCheckAvailability();
-        sendWhatsAppConfirmation(name, phone, location, service, date, time);
+        goToBookingStep(1);
 
     } catch (error) {
         console.error('Error al agendar cita:', error);
@@ -370,8 +437,33 @@ async function handleAppointmentSubmit(e) {
         // 3. Restaurar el Botón (Se ejecuta siempre, haya éxito o error)
         if (submitBtn) submitBtn.disabled = false;
         if (submitSpinner) submitSpinner.classList.add('d-none');
-        if (submitText) submitText.innerText = 'Enviar Mensaje por WhatsApp';
+        if (submitText) submitText.innerText = 'Confirmar Cita';
     }
+}
+
+/* --- RESUMEN DE LA CITA (PASO 3 DEL WIZARD) --- */
+function renderBookingSummary() {
+    const summaryEl = document.getElementById('bookingSummary');
+    if (!summaryEl) return;
+
+    const location = document.getElementById('formLocation').value;
+    const service = document.getElementById('formService').value;
+    const date = document.getElementById('formDate').value;
+    const time = document.getElementById('formTime').value;
+
+    const dateFormatted = date
+        ? new Date(date + 'T00:00:00').toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' })
+        : '';
+
+    summaryEl.innerHTML = `
+        <div class="booking-summary-title"><i class="bi bi-clipboard-check"></i> Resumen de tu cita</div>
+        <ul class="booking-summary-list">
+            <li><i class="bi bi-geo-alt"></i> ${location || '—'}</li>
+            <li><i class="bi bi-stars"></i> ${service || '—'}</li>
+            <li><i class="bi bi-calendar-event"></i> ${dateFormatted || '—'}</li>
+            <li><i class="bi bi-clock"></i> ${time || '—'}</li>
+        </ul>
+    `;
 }
 
 function sendWhatsAppConfirmation(name, phone, location, service, date, time) {
@@ -587,14 +679,6 @@ function populateGeneralInfo() {
     document.querySelector(".data-stat-satisfaction").innerText =
         CLINIC_CONFIG.hero.satisfactionRate;
 
-    // Testimonio
-    document.querySelector(".data-testimonial-quote").innerText =
-        `"${CLINIC_CONFIG.testimonial.quote}"`;
-    document.querySelector(".data-testimonial-author").innerText =
-        CLINIC_CONFIG.testimonial.author;
-    document.querySelector(".data-testimonial-role").innerText =
-        CLINIC_CONFIG.testimonial.role;
-
     // Enlaces a WhatsApp generados
     const waUrl = `https://wa.me/${CLINIC_CONFIG.whatsappNumber}?text=${encodeURIComponent("Hola, me gustaría agendar una consulta")}`;
     document
@@ -721,6 +805,80 @@ function renderSocialLinks() {
         ${links.instagram ? `<a href="${links.instagram}" target="_blank" aria-label="Instagram"><i class="bi bi-instagram"></i></a>` : ""}
         ${links.twitter ? `<a href="${links.twitter}" target="_blank" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>` : ""}
     `;
+}
+
+/* --- RENDERIZAR TESTIMONIOS (CARRUSEL AUTOMÁTICO) --- */
+let testimonialIndex = 0;
+let testimonialInterval = null;
+
+function renderTestimonials() {
+    const container = document.getElementById('testimonials-container');
+    const dotsContainer = document.getElementById('testimonials-dots');
+    const items = CLINIC_CONFIG.testimonials;
+
+    if (!container || !items || items.length === 0) return;
+
+    function paintTestimonial() {
+        const t = items[testimonialIndex];
+        container.innerHTML = `
+            <div class="text-warning mb-3">
+                ${'<i class="bi bi-star-fill"></i>'.repeat(5)}
+            </div>
+            <p class="fs-5 fst-italic mb-4">"${t.quote}"</p>
+            <h4 class="h6 fw-bold mb-0">${t.author}</h4>
+            <small class="text-muted">${t.role}</small>
+        `;
+
+        if (dotsContainer) {
+            dotsContainer.innerHTML = items
+                .map((_, i) => `<button type="button" class="testimonial-dot ${i === testimonialIndex ? 'active' : ''}" data-index="${i}" aria-label="Ver testimonio ${i + 1}"></button>`)
+                .join('');
+
+            dotsContainer.querySelectorAll('.testimonial-dot').forEach((dot) => {
+                dot.addEventListener('click', () => {
+                    testimonialIndex = parseInt(dot.getAttribute('data-index'), 10);
+                    paintTestimonial();
+                    restartTestimonialInterval();
+                });
+            });
+        }
+    }
+
+    function restartTestimonialInterval() {
+        if (testimonialInterval) clearInterval(testimonialInterval);
+        if (items.length > 1) {
+            testimonialInterval = setInterval(() => {
+                testimonialIndex = (testimonialIndex + 1) % items.length;
+                paintTestimonial();
+            }, 6000);
+        }
+    }
+
+    paintTestimonial();
+    restartTestimonialInterval();
+}
+
+/* --- RENDERIZAR PREGUNTAS FRECUENTES (ACORDEÓN) --- */
+function renderFAQ() {
+    const container = document.getElementById('faqAccordion');
+    if (!container || !CLINIC_CONFIG.faqs) return;
+
+    container.innerHTML = CLINIC_CONFIG.faqs
+        .map(
+            (faq, i) => `
+                <div class="accordion-item faq-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button ${i === 0 ? '' : 'collapsed'}" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse${i}">
+                            ${faq.q}
+                        </button>
+                    </h2>
+                    <div id="faqCollapse${i}" class="accordion-collapse collapse ${i === 0 ? 'show' : ''}" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-muted">${faq.a}</div>
+                    </div>
+                </div>
+            `
+        )
+        .join('');
 }
 
 /* --- TOGGLE WHATSAPP POPUP WIDGET --- */
