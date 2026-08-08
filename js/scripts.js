@@ -169,6 +169,16 @@ function validateAndCheckAvailability() {
     checkAvailability();
 }
 
+// Función auxiliar para asegurarnos de que la hora siempre tenga 2 dígitos en la hora (ej: "9:00" -> "09:00")
+function normalizeTimeStr(timeStr) {
+    if (!timeStr) return '';
+    const parts = timeStr.trim().split(':');
+    if (parts.length >= 2) {
+        return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
+    }
+    return timeStr.trim();
+}
+
 async function checkAvailability() {
     const dateInput = document.getElementById('formDate');
     const locationSelect = document.getElementById('formLocation');
@@ -189,23 +199,21 @@ async function checkAvailability() {
     }
 
     try {
-        // Obtener horarios ocupados de la API
         const ocupados = await API.getCitas(fecha, sucursal);
         
-        // Obtener hora actual para validar si es hoy
         const now = new Date();
         const todayStr = now.toISOString().split('T')[0];
         const isToday = fecha === todayStr;
-        const currentHour = now.getHours();
-        const currentMinute = now.getMinutes();
         
-        // Generar horarios disponibles con validaciones
-        const horariosOcupados = ocupados.map(c => c.hora);
+        // Normalizamos todas las horas recibidas de la API a formato "HH:mm"
+        const horariosOcupados = ocupados.map(c => normalizeTimeStr(c.hora));
+        
+        // Filtramos sobre la lista global de horarios de la clínica
         let horariosDisponibles = CLINIC_CONFIG.timeSlots.filter(
-            hora => !horariosOcupados.includes(hora)
+            hora => !horariosOcupados.includes(normalizeTimeStr(hora))
         );
 
-        // Si es hoy, filtrar horas pasadas
+        // Si es el día de hoy, descardamos horas que ya pasaron
         if (isToday) {
             horariosDisponibles = horariosDisponibles.filter(hora => {
                 const [h, m] = hora.split(':').map(Number);
@@ -215,13 +223,12 @@ async function checkAvailability() {
             });
         }
 
-        // Actualizar select de horas
         timeSelect.innerHTML = '<option value="">-- Seleccionar hora --</option>';
         
         if (horariosDisponibles.length === 0) {
-            let mensaje = 'No hay horarios disponibles para esta fecha.';
+            let mensaje = 'No hay horarios disponibles para esta fecha y sucursal.';
             if (isToday) {
-                mensaje = 'No hay horarios disponibles para hoy. Por favor selecciona otra fecha.';
+                mensaje = 'No hay horarios disponibles para el resto del día de hoy.';
             }
             timeSelect.innerHTML += `<option value="" disabled>${mensaje}</option>`;
             if (availabilityMsg) {
@@ -270,6 +277,10 @@ async function checkAvailability() {
 async function handleAppointmentSubmit(e) {
     e.preventDefault();
 
+    const submitBtn = document.getElementById('submitBtn');
+    const submitSpinner = document.getElementById('submitSpinner');
+    const submitText = document.getElementById('submitText');
+
     const name = document.getElementById('formName').value.trim();
     const phone = document.getElementById('formPhone').value.trim();
     const location = document.getElementById('formLocation').value;
@@ -278,9 +289,8 @@ async function handleAppointmentSubmit(e) {
     const time = document.getElementById('formTime').value;
     const message = document.getElementById('formMessage').value.trim();
 
-    // Validaciones mejoradas
+    // 1. Validaciones locales previas al envío
     const errors = [];
-
     if (!name) errors.push('Nombre completo');
     if (!phone) errors.push('Teléfono');
     if (!location) errors.push('Sucursal');
@@ -293,7 +303,6 @@ async function handleAppointmentSubmit(e) {
         return;
     }
 
-    // Validar que la fecha no sea pasada
     const today = new Date();
     const todayStr = today.toISOString().split('T')[0];
     const selectedDate = new Date(date + 'T00:00:00');
@@ -303,7 +312,6 @@ async function handleAppointmentSubmit(e) {
         return;
     }
 
-    // Si es hoy, validar que la hora no sea pasada
     if (date === todayStr) {
         const now = new Date();
         const [h, m] = time.split(':').map(Number);
@@ -317,8 +325,13 @@ async function handleAppointmentSubmit(e) {
         }
     }
 
-    // Verificar nuevamente disponibilidad
+    // 2. Activar Estado de Carga (Loading State)
+    if (submitBtn) submitBtn.disabled = true;
+    if (submitSpinner) submitSpinner.classList.remove('d-none');
+    if (submitText) submitText.innerText = 'Agendando cita...';
+
     try {
+        // Verificar disponibilidad
         const ocupados = await API.getCitas(date, location);
         if (ocupados.some(c => c.hora === time)) {
             showNotification('Este horario ya no está disponible. Por favor selecciona otro.', 'error');
@@ -340,25 +353,24 @@ async function handleAppointmentSubmit(e) {
 
         await API.crearCita(citaData);
 
-        // Mostrar éxito
+        // Notificación y reseteo
         showNotification('¡Cita agendada exitosamente! Te esperamos.', 'success');
-        
-        // Limpiar formulario
         document.getElementById('appointmentForm').reset();
         
-        // Resetear fecha a hoy
         const todayStr2 = new Date().toISOString().split('T')[0];
         document.getElementById('formDate').value = todayStr2;
 
-        // Resetear horarios
         validateAndCheckAvailability();
-
-        // Enviar WhatsApp
         sendWhatsAppConfirmation(name, phone, location, service, date, time);
 
     } catch (error) {
         console.error('Error al agendar cita:', error);
         showNotification('Error al agendar la cita: ' + error.message, 'error');
+    } finally {
+        // 3. Restaurar el Botón (Se ejecuta siempre, haya éxito o error)
+        if (submitBtn) submitBtn.disabled = false;
+        if (submitSpinner) submitSpinner.classList.add('d-none');
+        if (submitText) submitText.innerText = 'Enviar Mensaje por WhatsApp';
     }
 }
 
