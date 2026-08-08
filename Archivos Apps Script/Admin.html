@@ -2,8 +2,9 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <base target="_top" />
-  <title>Panel Administrativo</title>
+  <title>Panel Administrativo Dental</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
@@ -11,22 +12,32 @@
     :root {
       --primary-color: #0D9488;
       --primary-hover: #0F766E;
+      --primary-light: #CCFBF1;
       --secondary-color: #0F172A;
       --accent-bg: #F0FDFA;
       --soft-bg: #F8FAFC;
       --text-dark: #1E293B;
       --text-muted: #64748B;
+      --border-color: #E2E8F0;
       --danger: #DC2626;
       --warning: #D97706;
       --font-main: 'Plus Jakarta Sans', sans-serif;
+      --sidebar-width: 240px;
     }
-    * { box-sizing: border-box; }
-    body {
+
+    * {
+      box-sizing: border-box;
       margin: 0;
+      padding: 0;
+    }
+
+    body {
       font-family: var(--font-main);
       background: var(--soft-bg);
       color: var(--text-dark);
+      line-height: 1.5;
     }
+
     .hidden { display: none !important; }
 
     /* ---------- LOGIN ---------- */
@@ -38,30 +49,70 @@
       padding: 20px;
       background: linear-gradient(160deg, #F0FDFA 0%, #F8FAFC 60%);
     }
+
     .login-card {
       background: #fff;
       border-radius: 20px;
-      padding: 40px 32px;
+      padding: 36px 28px;
       width: 100%;
-      max-width: 380px;
-      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
-      border: 1px solid #F1F5F9;
+      max-width: 400px;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.06);
+      border: 1px solid var(--border-color);
       text-align: center;
     }
-    .login-card i.bi-heart-pulse-fill { color: var(--primary-color); font-size: 2rem; }
-    .login-card h1 { font-size: 1.3rem; font-weight: 800; margin: 10px 0 4px; }
-    .login-card p.subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px; }
-    .form-group { text-align: left; margin-bottom: 14px; }
-    .form-group label { display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 6px; color: var(--text-dark); }
+
+    .login-card i.bi-heart-pulse-fill {
+      color: var(--primary-color);
+      font-size: 2.5rem;
+    }
+
+    .login-card h1 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin: 12px 0 4px;
+      color: var(--secondary-color);
+    }
+
+    .login-card p.subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+    }
+
+    /* ---------- FORM CONTROLS ---------- */
+    .form-group {
+      text-align: left;
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--text-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
     .form-control {
       width: 100%;
-      padding: 10px 12px;
+      padding: 10px 14px;
       border-radius: 10px;
-      border: 1.5px solid #E2E8F0;
+      border: 1.5px solid var(--border-color);
       font-family: var(--font-main);
-      font-size: 0.95rem;
+      font-size: 0.92rem;
+      background-color: #fff;
+      color: var(--text-dark);
+      transition: all 0.2s ease;
     }
-    .form-control:focus { outline: none; border-color: var(--primary-color); }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+    }
+
     .btn {
       border: none;
       border-radius: 10px;
@@ -73,109 +124,519 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 8px;
     }
-    .btn-primary { background: var(--primary-color); color: #fff; width: 100%; }
-    .btn-primary:hover { background: var(--primary-hover); }
-    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-    .btn-outline { background: #fff; border: 1.5px solid #E2E8F0; color: var(--text-dark); }
-    .btn-outline:hover { border-color: var(--primary-color); color: var(--primary-color); }
-    .btn-danger-ghost { background: transparent; color: var(--danger); border: 1.5px solid #FCA5A5; padding: 6px 10px; font-size: 0.8rem; }
-    .btn-danger-ghost:hover { background: #FEF2F2; }
-    .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
-    .login-error { color: var(--danger); font-size: 0.85rem; margin-top: 10px; min-height: 18px; }
-    .login-divider { display: flex; align-items: center; gap: 10px; margin: 18px 0; color: var(--text-muted); font-size: 0.75rem; }
-    .login-divider::before, .login-divider::after { content: ''; flex: 1; height: 1px; background: #E2E8F0; }
 
-    /* ---------- APP SHELL ---------- */
-    #appShell { display: flex; min-height: 100vh; }
+    .btn-primary {
+      background: var(--primary-color);
+      color: #fff;
+      width: 100%;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .btn-outline {
+      background: #fff;
+      border: 1.5px solid var(--border-color);
+      color: var(--text-dark);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+      background: var(--accent-bg);
+    }
+
+    .btn-danger-ghost {
+      background: transparent;
+      color: var(--danger);
+      border: 1.5px solid #FCA5A5;
+      padding: 6px 10px;
+      font-size: 0.82rem;
+      border-radius: 8px;
+    }
+
+    .btn-danger-ghost:hover {
+      background: #FEF2F2;
+    }
+
+    .btn-sm {
+      padding: 7px 12px;
+      font-size: 0.82rem;
+    }
+
+    .login-error {
+      color: var(--danger);
+      font-size: 0.85rem;
+      margin-top: 10px;
+      min-height: 20px;
+    }
+
+    .login-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 20px 0;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .login-divider::before, .login-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-color);
+    }
+
+    /* ---------- APP SHELL & MOBILE TOPBAR ---------- */
+    #appShell {
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    @media (min-width: 769px) {
+      #appShell {
+        flex-direction: row;
+      }
+    }
+
+    .mobile-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--secondary-color);
+      color: #fff;
+      padding: 12px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+    }
+
+    @media (min-width: 769px) {
+      .mobile-topbar {
+        display: none;
+      }
+    }
+
+    .mobile-topbar .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 1.05rem;
+    }
+
+    .mobile-topbar .brand i {
+      color: var(--primary-color);
+    }
+
+    .menu-toggle {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+
+    /* ---------- SIDEBAR ---------- */
     .sidebar {
-      width: 220px;
+      width: var(--sidebar-width);
       background: var(--secondary-color);
       color: #fff;
       display: flex;
       flex-direction: column;
       padding: 20px 14px;
       flex-shrink: 0;
+      z-index: 100;
+      transition: transform 0.3s ease;
     }
-    .sidebar .brand { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.05rem; padding: 0 8px 20px; }
-    .sidebar .brand i { color: var(--primary-color); }
-    .nav-btn {
+
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        transform: translateX(-100%);
+        box-shadow: 4px 0 20px rgba(0,0,0,0.25);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+    }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(2px);
+      z-index: 95;
+    }
+
+    .sidebar-overlay.active {
+      display: block;
+    }
+
+    .sidebar .brand {
       display: flex;
       align-items: center;
       gap: 10px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      padding: 0 8px 24px;
+    }
+
+    .sidebar .brand i {
+      color: var(--primary-color);
+      font-size: 1.3rem;
+    }
+
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
       width: 100%;
       background: transparent;
       border: none;
-      color: #CBD5E1;
-      padding: 11px 12px;
+      color: #94A3B8;
+      padding: 12px 14px;
       border-radius: 10px;
       font-weight: 600;
       font-size: 0.9rem;
       cursor: pointer;
       text-align: left;
       margin-bottom: 4px;
+      transition: all 0.2s ease;
     }
-    .nav-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
-    .nav-btn.active { background: var(--primary-color); color: #fff; }
-    .sidebar-footer { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 14px; }
-    .sidebar-user { font-size: 0.8rem; color: #94A3B8; margin-bottom: 10px; padding: 0 8px; }
-    .sidebar-user strong { color: #fff; display: block; font-size: 0.85rem; }
 
-    .main-content { flex: 1; padding: 28px 32px; max-width: 100%; overflow-x: hidden; }
-    .page-title { font-size: 1.4rem; font-weight: 800; margin: 0 0 4px; }
-    .page-subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px; }
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+    }
+
+    .nav-btn.active {
+      background: var(--primary-color);
+      color: #fff;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 16px;
+    }
+
+    .sidebar-user {
+      font-size: 0.8rem;
+      color: #94A3B8;
+      margin-bottom: 12px;
+      padding: 0 8px;
+    }
+
+    .sidebar-user strong {
+      color: #fff;
+      display: block;
+      font-size: 0.88rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ---------- MAIN CONTENT ---------- */
+    .main-content {
+      flex: 1;
+      padding: 20px 16px;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    @media (min-width: 769px) {
+      .main-content {
+        padding: 32px 36px;
+      }
+    }
+
+    .page-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin: 0 0 4px;
+      color: var(--secondary-color);
+    }
+
+    .page-subtitle {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      margin-bottom: 20px;
+    }
 
     .panel { display: none; }
     .panel.active { display: block; }
 
-    /* ---------- CARDS / DASHBOARD ---------- */
-    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 24px; }
-    .stat-card { background: #fff; border-radius: 14px; padding: 18px 20px; border: 1px solid #F1F5F9; box-shadow: 0 6px 18px rgba(15,23,42,0.03); }
-    .stat-card .num { font-size: 1.8rem; font-weight: 800; color: var(--primary-color); }
-    .stat-card .label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+    /* ---------- STATS & DASHBOARD ---------- */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
 
-    .breakdown-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    @media (max-width: 800px) { .breakdown-grid { grid-template-columns: 1fr; } }
-    .breakdown-card { background: #fff; border-radius: 14px; padding: 20px; border: 1px solid #F1F5F9; }
-    .breakdown-card h3 { font-size: 0.95rem; font-weight: 700; margin: 0 0 14px; }
+    .stat-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 18px 16px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 12px rgba(15,23,42,0.02);
+    }
+
+    .stat-card .num {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--primary-color);
+      line-height: 1.2;
+    }
+
+    .stat-card .label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .breakdown-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 800px) {
+      .breakdown-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .breakdown-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 20px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 12px rgba(15,23,42,0.02);
+    }
+
+    .breakdown-card h3 {
+      font-size: 0.98rem;
+      font-weight: 700;
+      margin: 0 0 16px;
+      color: var(--secondary-color);
+    }
+
     .bar-row { margin-bottom: 12px; }
-    .bar-row .bar-label { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; }
-    .bar-track { background: #F1F5F9; border-radius: 6px; height: 8px; overflow: hidden; }
-    .bar-fill { background: var(--primary-color); height: 100%; border-radius: 6px; }
+    .bar-row .bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .bar-track {
+      background: #F1F5F9;
+      border-radius: 6px;
+      height: 8px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      background: var(--primary-color);
+      height: 100%;
+      border-radius: 6px;
+    }
 
     /* ---------- FILTERS / TABLE ---------- */
-    .filters-bar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; align-items: flex-end; }
-    .filters-bar .form-group { margin-bottom: 0; min-width: 150px; }
-    .table-wrap { background: #fff; border-radius: 14px; border: 1px solid #F1F5F9; overflow: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-    th { background: var(--soft-bg); text-align: left; padding: 10px 14px; font-weight: 700; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; white-space: nowrap; }
-    td { padding: 10px 14px; border-top: 1px solid #F1F5F9; vertical-align: middle; }
-    .estado-select { border-radius: 8px; border: 1.5px solid #E2E8F0; padding: 5px 8px; font-size: 0.8rem; font-weight: 600; font-family: var(--font-main); }
-    .estado-badge { padding: 3px 9px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; display: inline-block; }
-    .badge-Pendiente { background: #FEF3C7; color: #92400E; }
-    .badge-Confirmada { background: #D1FAE5; color: #065F46; }
-    .badge-Cancelada { background: #FEE2E2; color: #991B1B; }
-    .badge-Completada { background: #DBEAFE; color: #1E40AF; }
-    .badge-No.asistió, .badge-No-asistió { background: #E2E8F0; color: #334155; }
-    .empty-state { text-align: center; padding: 40px; color: var(--text-muted); }
+    .filters-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+      background: #fff;
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+    }
 
-    /* ---------- FORM AGENDAR ---------- */
-    .card-form { background: #fff; border-radius: 14px; padding: 24px; border: 1px solid #F1F5F9; max-width: 560px; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+    .filters-bar .form-group { margin-bottom: 0; }
+
+    .filter-actions {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .filter-actions .btn {
+      flex: 1;
+    }
+
+    .table-wrap {
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+      overflow-x: auto;
+      box-shadow: 0 4px 12px rgba(15,23,42,0.02);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      min-width: 700px;
+    }
+
+    th {
+      background: var(--soft-bg);
+      text-align: left;
+      padding: 12px 14px;
+      font-weight: 700;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    td {
+      padding: 12px 14px;
+      border-top: 1px solid var(--border-color);
+      vertical-align: middle;
+    }
+
+    .estado-select {
+      border-radius: 8px;
+      border: 1.5px solid var(--border-color);
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: var(--font-main);
+      background-color: #fff;
+      cursor: pointer;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* ---------- FORMS ---------- */
+    .card-form {
+      background: #fff;
+      border-radius: 14px;
+      padding: 24px;
+      border: 1px solid var(--border-color);
+      max-width: 600px;
+      box-shadow: 0 4px 12px rgba(15,23,42,0.02);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    @media (min-width: 580px) {
+      .form-row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
 
     /* ---------- PACIENTES ---------- */
-    .patient-card { background: #fff; border-radius: 14px; padding: 16px 20px; border: 1px solid #F1F5F9; margin-bottom: 12px; }
-    .patient-card .patient-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
-    .patient-card .patient-name { font-weight: 700; }
-    .patient-card .patient-meta { font-size: 0.8rem; color: var(--text-muted); }
-    .patient-notes { margin-top: 10px; font-size: 0.82rem; color: var(--text-dark); }
-    .patient-notes .note-line { padding: 6px 0; border-top: 1px dashed #E2E8F0; }
-    .toast-container { position: fixed; top: 18px; right: 18px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
-    .toast { background: var(--secondary-color); color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 0.85rem; box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+    .patient-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 18px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(15,23,42,0.02);
+    }
+
+    .patient-card .patient-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .patient-card .patient-name {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--secondary-color);
+    }
+
+    .patient-card .patient-meta {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .patient-notes {
+      margin-top: 12px;
+      font-size: 0.84rem;
+      color: var(--text-dark);
+      background: var(--soft-bg);
+      padding: 10px 12px;
+      border-radius: 8px;
+    }
+
+    .patient-notes .note-line {
+      padding: 4px 0;
+    }
+
+    .patient-notes .note-line:not(:last-child) {
+      border-bottom: 1px dashed var(--border-color);
+    }
+
+    /* ---------- TOASTS ---------- */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 90vw;
+    }
+
+    .toast {
+      background: var(--secondary-color);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      animation: slideIn 0.3s ease;
+    }
+
     .toast.error { background: var(--danger); }
     .toast.success { background: var(--primary-color); }
+
+    @keyframes slideIn {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
   </style>
 </head>
 <body>
@@ -185,43 +646,72 @@
     <div class="login-card">
       <i class="bi bi-heart-pulse-fill"></i>
       <h1>Panel Administrativo</h1>
-      <p class="subtitle">Inicia sesión para gestionar las citas</p>
+      <p class="subtitle">Inicia sesión para gestionar tus citas</p>
 
       <form id="loginForm">
         <div class="form-group">
-          <label for="loginEmail">Correo</label>
-          <input type="email" id="loginEmail" class="form-control" required autocomplete="username" />
+          <label for="loginEmail">Correo electrónico</label>
+          <input type="email" id="loginEmail" class="form-control" placeholder="nombre@ejemplo.com" required autocomplete="username" />
         </div>
         <div class="form-group">
           <label for="loginPassword">Contraseña</label>
-          <input type="password" id="loginPassword" class="form-control" required autocomplete="current-password" />
+          <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required autocomplete="current-password" />
         </div>
         <button type="submit" id="loginBtn" class="btn btn-primary">
-          <span id="loginBtnText">Entrar</span>
+          <span id="loginBtnText">Entrar al Sistema</span>
         </button>
         <div class="login-error" id="loginError"></div>
       </form>
 
       <div class="login-divider">O</div>
       <button type="button" id="googleRetryBtn" class="btn btn-outline" style="width:100%">
-        <i class="bi bi-google"></i> Intentar con mi cuenta de Google
+        <i class="bi bi-google"></i> Continuar con Google
       </button>
     </div>
   </div>
 
   <!-- ===================== APP SHELL ===================== -->
   <div id="appShell" class="hidden">
-    <aside class="sidebar">
-      <div class="brand"><i class="bi bi-heart-pulse-fill"></i> Panel Dental</div>
+    
+    <!-- TOPBAR MÓVIL -->
+    <header class="mobile-topbar">
+      <div class="brand">
+        <i class="bi bi-heart-pulse-fill"></i>
+        <span>Panel Dental</span>
+      </div>
+      <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
+        <i class="bi bi-list"></i>
+      </button>
+    </header>
 
-      <button class="nav-btn active" data-tab="dashboard"><i class="bi bi-speedometer2"></i> Dashboard</button>
-      <button class="nav-btn" data-tab="citas"><i class="bi bi-calendar3"></i> Citas</button>
-      <button class="nav-btn" data-tab="agendar"><i class="bi bi-calendar-plus"></i> Agendar</button>
-      <button class="nav-btn" data-tab="pacientes"><i class="bi bi-people"></i> Pacientes</button>
+    <!-- OVERLAY MÓVIL -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <i class="bi bi-heart-pulse-fill"></i>
+        <span>Panel Dental</span>
+      </div>
+
+      <nav>
+        <button class="nav-btn active" data-tab="dashboard">
+          <i class="bi bi-speedometer2"></i> Dashboard
+        </button>
+        <button class="nav-btn" data-tab="citas">
+          <i class="bi bi-calendar3"></i> Citas
+        </button>
+        <button class="nav-btn" data-tab="agendar">
+          <i class="bi bi-calendar-plus"></i> Agendar
+        </button>
+        <button class="nav-btn" data-tab="pacientes">
+          <i class="bi bi-people"></i> Pacientes
+        </button>
+      </nav>
 
       <div class="sidebar-footer">
         <div class="sidebar-user">
-          Sesión iniciada como<br />
+          Usuario activo
           <strong id="sidebarUserName">—</strong>
         </div>
         <button class="btn btn-outline btn-sm" id="logoutBtn" style="width:100%">
@@ -230,16 +720,26 @@
       </div>
     </aside>
 
+    <!-- MAIN CONTENT -->
     <main class="main-content">
       <!-- DASHBOARD -->
       <section class="panel active" data-panel="dashboard">
         <h2 class="page-title">Dashboard</h2>
-        <p class="page-subtitle">Resumen general de tus citas</p>
+        <p class="page-subtitle">Resumen general de actividad y citas</p>
 
         <div class="stats-row">
-          <div class="stat-card"><div class="num" id="statTotal">—</div><div class="label">Citas totales</div></div>
-          <div class="stat-card"><div class="num" id="statHoy">—</div><div class="label">Citas hoy</div></div>
-          <div class="stat-card"><div class="num" id="statSemana">—</div><div class="label">Citas esta semana</div></div>
+          <div class="stat-card">
+            <div class="num" id="statTotal">—</div>
+            <div class="label">Total Citas</div>
+          </div>
+          <div class="stat-card">
+            <div class="num" id="statHoy">—</div>
+            <div class="label">Citas de Hoy</div>
+          </div>
+          <div class="stat-card">
+            <div class="num" id="statSemana">—</div>
+            <div class="label">Esta Semana</div>
+          </div>
         </div>
 
         <div class="breakdown-grid">
@@ -256,24 +756,26 @@
         <div class="breakdown-card" style="margin-top:20px;">
           <h3>Respaldo de la base de datos</h3>
           <p class="page-subtitle" style="margin:0 0 12px;">
-            Se genera automáticamente cada semana (si ya instalaste el disparador). También puedes generarlo manualmente cuando quieras.
+            Generación automática programada. También puedes realizar una copia de seguridad manualmente.
           </p>
           <p style="font-size:0.85rem; margin:0 0 14px;">
             Último respaldo: <strong id="lastBackupDate">—</strong>
           </p>
-          <button class="btn btn-outline btn-sm" id="btnRespaldoAhora" style="width:auto;">
-            <i class="bi bi-cloud-arrow-down"></i> Generar respaldo ahora
-          </button>
-          <a id="lastBackupLink" href="#" target="_blank" class="btn btn-outline btn-sm hidden" style="width:auto; margin-left:8px;">
-            <i class="bi bi-box-arrow-up-right"></i> Ver último respaldo
-          </a>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="btn btn-outline btn-sm" id="btnRespaldoAhora" style="width:auto;">
+              <i class="bi bi-cloud-arrow-down"></i> Generar respaldo
+            </button>
+            <a id="lastBackupLink" href="#" target="_blank" class="btn btn-outline btn-sm hidden" style="width:auto;">
+              <i class="bi bi-box-arrow-up-right"></i> Ver archivo
+            </a>
+          </div>
         </div>
       </section>
 
       <!-- CITAS -->
       <section class="panel" data-panel="citas">
         <h2 class="page-title">Citas</h2>
-        <p class="page-subtitle">Consulta, filtra y actualiza el estatus de cada cita</p>
+        <p class="page-subtitle">Consulta, filtra y gestiona los estados de las citas</p>
 
         <div class="filters-bar">
           <div class="form-group">
@@ -288,42 +790,51 @@
             <label>Estatus</label>
             <select id="filterEstado" class="form-control"><option value="">Todos</option></select>
           </div>
-          <div class="form-group" style="flex:1;">
+          <div class="form-group">
             <label>Buscar</label>
-            <input type="text" id="filterBusqueda" class="form-control" placeholder="Nombre o teléfono" />
+            <input type="text" id="filterBusqueda" class="form-control" placeholder="Nombre o teléfono..." />
           </div>
-          <button class="btn btn-primary" id="btnFiltrar" style="width:auto;"><i class="bi bi-search"></i> Filtrar</button>
-          <button class="btn btn-outline" id="btnLimpiarFiltros" style="width:auto;">Limpiar</button>
+          <div class="filter-actions" style="grid-column: 1 / -1; display: flex; gap: 8px;">
+            <button class="btn btn-primary btn-sm" id="btnFiltrar"><i class="bi bi-search"></i> Filtrar</button>
+            <button class="btn btn-outline btn-sm" id="btnLimpiarFiltros">Limpiar</button>
+          </div>
         </div>
 
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>Fecha</th><th>Hora</th><th>Paciente</th><th>Teléfono</th>
-                <th>Sucursal</th><th>Servicio</th><th>Notas</th><th>Estatus</th><th></th><th></th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Paciente</th>
+                <th>Teléfono</th>
+                <th>Sucursal</th>
+                <th>Servicio</th>
+                <th>Notas</th>
+                <th>Estatus</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody id="citasTableBody"></tbody>
           </table>
-          <div id="citasEmptyState" class="empty-state hidden">No se encontraron citas con esos filtros.</div>
+          <div id="citasEmptyState" class="empty-state hidden">No se encontraron citas con los filtros seleccionados.</div>
         </div>
       </section>
 
       <!-- AGENDAR -->
       <section class="panel" data-panel="agendar">
-        <h2 class="page-title">Agendar cita manualmente</h2>
-        <p class="page-subtitle">Para pacientes que llaman por teléfono o llegan directo</p>
+        <h2 class="page-title">Agendar cita</h2>
+        <p class="page-subtitle">Registro manual para atención telefónica o presencial</p>
 
         <div class="card-form">
           <form id="agendarForm">
             <div class="form-group">
-              <label>Nombre del paciente</label>
-              <input type="text" id="agPaciente" class="form-control" required />
+              <label>Nombre completo del paciente</label>
+              <input type="text" id="agPaciente" class="form-control" placeholder="Ej. Ana García" required />
             </div>
             <div class="form-group">
               <label>Teléfono (10 dígitos)</label>
-              <input type="tel" id="agTelefono" class="form-control" required />
+              <input type="tel" id="agTelefono" class="form-control" placeholder="Ej. 5512345678" required />
             </div>
             <div class="form-row">
               <div class="form-group">
@@ -350,11 +861,11 @@
               <select id="agEstado" class="form-control"></select>
             </div>
             <div class="form-group">
-              <label>Notas (opcional)</label>
-              <textarea id="agNotas" class="form-control" rows="2"></textarea>
+              <label>Notas adicionales (opcional)</label>
+              <textarea id="agNotas" class="form-control" rows="2" placeholder="Detalles de la consulta..."></textarea>
             </div>
             <button type="submit" class="btn btn-primary" id="agSubmitBtn">
-              <i class="bi bi-check-circle"></i> <span id="agSubmitText">Guardar cita</span>
+              <i class="bi bi-check-circle"></i> <span id="agSubmitText">Guardar Cita</span>
             </button>
           </form>
         </div>
@@ -362,15 +873,15 @@
 
       <!-- PACIENTES -->
       <section class="panel" data-panel="pacientes">
-        <h2 class="page-title">Pacientes</h2>
-        <p class="page-subtitle">Historial agrupado por número de teléfono</p>
+        <h2 class="page-title">Directorio de Pacientes</h2>
+        <p class="page-subtitle">Historial de citas agrupado por número de contacto</p>
 
-        <div class="form-group" style="max-width:320px; margin-bottom:18px;">
+        <div class="form-group" style="max-width:360px; margin-bottom:18px;">
           <input type="text" id="pacienteBusqueda" class="form-control" placeholder="Buscar por nombre o teléfono..." />
         </div>
 
         <div id="pacientesList"></div>
-        <div id="pacientesEmptyState" class="empty-state hidden">Aún no hay pacientes registrados.</div>
+        <div id="pacientesEmptyState" class="empty-state hidden">No hay pacientes registrados aún.</div>
       </section>
     </main>
   </div>
@@ -380,9 +891,13 @@
   <script>
     const state = { token: null, nombre: '', email: '', config: null, pacientesCache: [] };
 
-    /* ---------- Helper: envolver google.script.run en promesas ---------- */
+    /* ---------- Helper: Promesas para google.script.run ---------- */
     function callServer(fnName, ...args) {
       return new Promise((resolve, reject) => {
+        if (typeof google === 'undefined' || !google.script || !google.script.run) {
+          reject(new Error("Entorno de desarrollo / Google Apps Script no detectado."));
+          return;
+        }
         google.script.run
           .withSuccessHandler(resolve)
           .withFailureHandler((err) => reject(err))
@@ -399,7 +914,25 @@
       setTimeout(() => el.remove(), 4000);
     }
 
-    /* ---------- Inicialización / Login ---------- */
+    /* ---------- LÓGICA DEL MENÚ RESPONSIVO ---------- */
+    const sidebar = document.getElementById('sidebar');
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    function toggleMenu() {
+      sidebar.classList.toggle('open');
+      sidebarOverlay.classList.toggle('active');
+    }
+
+    function closeMenu() {
+      sidebar.classList.remove('open');
+      sidebarOverlay.classList.remove('active');
+    }
+
+    menuToggle.addEventListener('click', toggleMenu);
+    sidebarOverlay.addEventListener('click', closeMenu);
+
+    /* ---------- INICIALIZACIÓN / LOGIN ---------- */
     document.addEventListener('DOMContentLoaded', init);
 
     async function init() {
@@ -414,7 +947,7 @@
           onLoginSuccess(res.token, res.nombre, res.email);
           return;
         }
-      } catch (e) { /* sin sesión de Google disponible, mostramos el login normal */ }
+      } catch (e) { /* Sin sesión previa */ }
 
       document.getElementById('loginScreen').classList.remove('hidden');
     }
@@ -437,9 +970,10 @@
       const btn = document.getElementById('loginBtn');
       const btnText = document.getElementById('loginBtnText');
       const errorEl = document.getElementById('loginError');
+      
       errorEl.textContent = '';
       btn.disabled = true;
-      btnText.textContent = 'Entrando...';
+      btnText.textContent = 'Verificando...';
 
       try {
         const res = await callServer('loginWithPassword', email, password);
@@ -448,7 +982,7 @@
         errorEl.textContent = (err && err.message) || 'Correo o contraseña incorrectos';
       } finally {
         btn.disabled = false;
-        btnText.textContent = 'Entrar';
+        btnText.textContent = 'Entrar al Sistema';
       }
     });
 
@@ -458,10 +992,10 @@
         if (res && res.authenticated) {
           onLoginSuccess(res.token, res.nombre, res.email);
         } else {
-          showToast('Tu cuenta de Google no está autorizada en este panel. Usa correo y contraseña.', 'error');
+          showToast('Tu cuenta de Google no está autorizada. Usa correo y contraseña.', 'error');
         }
       } catch (e) {
-        showToast('No se pudo verificar tu cuenta de Google.', 'error');
+        showToast('No se pudo verificar la cuenta de Google.', 'error');
       }
     });
 
@@ -488,12 +1022,14 @@
       location.reload();
     });
 
-    /* ---------- Navegación entre tabs ---------- */
+    /* ---------- NAVEGACIÓN Y APERTURA DE TABS ---------- */
     document.querySelectorAll('.nav-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
         const tab = btn.getAttribute('data-tab');
         document.querySelectorAll('.nav-btn').forEach((b) => b.classList.toggle('active', b === btn));
         document.querySelectorAll('.panel').forEach((p) => p.classList.toggle('active', p.getAttribute('data-panel') === tab));
+
+        closeMenu(); // Cierra el menú al hacer clic en móvil
 
         if (tab === 'dashboard') loadDashboard();
         if (tab === 'citas') loadCitas();
@@ -501,7 +1037,7 @@
       });
     });
 
-    /* ---------- Catálogos (sucursales, servicios, estados, horarios) ---------- */
+    /* ---------- CATÁLOGOS ---------- */
     async function loadConfigListas() {
       const cfg = await callServer('getConfigListas', state.token);
       state.config = cfg;
@@ -521,7 +1057,6 @@
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('agFecha').min = today;
       document.getElementById('agFecha').value = today;
-      document.getElementById('filterFecha').min = '';
     }
 
     /* ---------- DASHBOARD ---------- */
@@ -536,7 +1071,7 @@
         renderBreakdown('breakdownSucursal', data.porSucursal);
         loadBackupInfo();
       } catch (err) {
-        showToast('No se pudo cargar el dashboard: ' + (err.message || err), 'error');
+        showToast('Error al cargar dashboard: ' + (err.message || err), 'error');
       }
     }
 
@@ -544,7 +1079,7 @@
       const container = document.getElementById(containerId);
       const entries = Object.entries(obj || {});
       if (entries.length === 0) {
-        container.innerHTML = '<p class="page-subtitle" style="margin:0;">Sin datos todavía</p>';
+        container.innerHTML = '<p class="page-subtitle" style="margin:0;">Sin datos registrados</p>';
         return;
       }
       const max = Math.max(...entries.map(([, v]) => v));
@@ -553,7 +1088,7 @@
         .map(([label, value]) => `
           <div class="bar-row">
             <div class="bar-label"><span>${label}</span><span>${value}</span></div>
-            <div class="bar-track"><div class="bar-fill" style="width:${(value / max) * 100}%"></div></div>
+            <div class="bar-track"><div class="bar-fill" style="width:${max > 0 ? (value / max) * 100 : 0}%"></div></div>
           </div>
         `).join('');
     }
@@ -599,20 +1134,28 @@
 
       body.innerHTML = citas.map((c) => `
         <tr data-uuid="${c.uuid}">
-          <td>${c.fecha}</td>
+          <td><strong>${c.fecha}</strong></td>
           <td>${c.hora}</td>
-          <td>${escapeHtml(c.paciente)}</td>
+          <td><strong>${escapeHtml(c.paciente)}</strong></td>
           <td>${escapeHtml(c.telefono)}</td>
           <td>${escapeHtml(c.sucursal)}</td>
           <td>${escapeHtml(c.servicio)}</td>
-          <td title="${escapeHtml(c.notas)}" style="max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(c.notas) || '—'}</td>
+          <td title="${escapeHtml(c.notas)}" style="max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(c.notas) || '—'}</td>
           <td>
             <select class="estado-select" data-uuid="${c.uuid}">
               ${estados.map((e) => `<option value="${e}" ${e === c.estado ? 'selected' : ''}>${e}</option>`).join('')}
             </select>
           </td>
-          <td><button class="btn-danger-ghost btn-eliminar" data-uuid="${c.uuid}"><i class="bi bi-trash3"></i></button></td>
-          <td><button class="btn-danger-ghost btn-pdf" data-uuid="${c.uuid}" style="color: var(--primary-color); border-color: #99F6E4;"><i class="bi bi-file-earmark-pdf"></i></button></td>
+          <td>
+            <div style="display:flex; gap:6px;">
+              <button class="btn-danger-ghost btn-pdf" data-uuid="${c.uuid}" title="Exportar PDF" style="color: var(--primary-color); border-color: #99F6E4;">
+                <i class="bi bi-file-earmark-pdf"></i>
+              </button>
+              <button class="btn-danger-ghost btn-eliminar" data-uuid="${c.uuid}" title="Eliminar cita">
+                <i class="bi bi-trash3"></i>
+              </button>
+            </div>
+          </td>
         </tr>
       `).join('');
 
@@ -621,7 +1164,7 @@
           const uuid = select.getAttribute('data-uuid');
           try {
             await callServer('adminUpdateEstado', state.token, uuid, select.value);
-            showToast('Estatus actualizado', 'success');
+            showToast('Estatus actualizado correctamente', 'success');
             loadDashboard();
           } catch (err) {
             showToast('No se pudo actualizar: ' + (err.message || err), 'error');
@@ -631,7 +1174,7 @@
 
       body.querySelectorAll('.btn-eliminar').forEach((btn) => {
         btn.addEventListener('click', async () => {
-          if (!confirm('¿Eliminar esta cita? Esta acción no se puede deshacer.')) return;
+          if (!confirm('¿Eliminar esta cita permanentemente?')) return;
           const uuid = btn.getAttribute('data-uuid');
           try {
             await callServer('adminEliminarCita', state.token, uuid);
@@ -656,7 +1199,7 @@
       try {
         const res = await callServer('adminExportCitaPDF', state.token, uuid);
         downloadBase64File(res.base64, res.filename, res.mimeType);
-        showToast('PDF generado', 'success');
+        showToast('PDF generado correctamente', 'success');
       } catch (err) {
         showToast('No se pudo generar el PDF: ' + (err.message || err), 'error');
       } finally {
@@ -681,22 +1224,20 @@
       URL.revokeObjectURL(url);
     }
 
-    /* ---------- RESPALDO SEMANAL ---------- */
+    /* ---------- RESPALDOS ---------- */
     async function loadBackupInfo() {
       try {
         const info = await callServer('adminGetBackupInfo', state.token);
         document.getElementById('lastBackupDate').textContent = info.lastBackupDate
           ? new Date(info.lastBackupDate).toLocaleString('es-MX')
-          : 'Nunca (aún no se ha generado ninguno)';
+          : 'Sin respaldos previos';
 
         const link = document.getElementById('lastBackupLink');
         if (info.lastBackupUrl) {
           link.href = info.lastBackupUrl;
           link.classList.remove('hidden');
         }
-      } catch (err) {
-        // Silencioso: no bloquea el resto del dashboard si falla
-      }
+      } catch (err) {}
     }
 
     document.getElementById('btnRespaldoAhora').addEventListener('click', async () => {
@@ -706,13 +1247,13 @@
       try {
         const res = await callServer('adminForzarRespaldo', state.token);
         downloadBase64File(res.base64, res.fileName, res.mimeType);
-        showToast('Respaldo generado y descargado: ' + res.fileName, 'success');
+        showToast('Respaldo descargado con éxito', 'success');
         loadBackupInfo();
       } catch (err) {
-        showToast('No se pudo generar el respaldo: ' + (err.message || err), 'error');
+        showToast('Error al generar respaldo: ' + (err.message || err), 'error');
       } finally {
         btn.disabled = false;
-        btn.innerHTML = '<i class="bi bi-cloud-arrow-down"></i> Generar respaldo ahora';
+        btn.innerHTML = '<i class="bi bi-cloud-arrow-down"></i> Generar respaldo';
       }
     });
 
@@ -731,7 +1272,7 @@
         return;
       }
 
-      horaSelect.innerHTML = '<option value="">Cargando...</option>';
+      horaSelect.innerHTML = '<option value="">Cargando horarios...</option>';
       try {
         const ocupadas = await callServer('adminGetCitas', state.token, { fecha, sucursal });
         const horasOcupadas = ocupadas.map((c) => c.hora);
@@ -741,7 +1282,7 @@
           ? '<option value="">-- Selecciona --</option>' + disponibles.map((h) => `<option value="${h}">${h}</option>`).join('')
           : '<option value="">Sin horarios disponibles</option>';
       } catch (err) {
-        horaSelect.innerHTML = '<option value="">Error al cargar horarios</option>';
+        horaSelect.innerHTML = '<option value="">Error al obtener horarios</option>';
       }
     }
 
@@ -771,7 +1312,7 @@
 
       try {
         await callServer('adminCrearCita', state.token, citaData);
-        showToast('Cita agendada correctamente', 'success');
+        showToast('Cita agendada con éxito', 'success');
         document.getElementById('agendarForm').reset();
         document.getElementById('agFecha').value = new Date().toISOString().split('T')[0];
         document.getElementById('agHora').innerHTML = '<option value="">Selecciona fecha y sucursal</option>';
@@ -780,7 +1321,7 @@
         showToast('No se pudo agendar: ' + (err.message || err), 'error');
       } finally {
         btn.disabled = false;
-        btnText.textContent = 'Guardar cita';
+        btnText.textContent = 'Guardar Cita';
       }
     });
 
@@ -819,10 +1360,10 @@
           <div class="patient-head">
             <div>
               <div class="patient-name">${escapeHtml(p.paciente) || 'Sin nombre'}</div>
-              <div class="patient-meta">${escapeHtml(p.telefono)} · ${p.sucursales.map(escapeHtml).join(', ')}</div>
+              <div class="patient-meta"><i class="bi bi-telephone"></i> ${escapeHtml(p.telefono)} · ${p.sucursales.map(escapeHtml).join(', ')}</div>
             </div>
             <div class="patient-meta">
-              <strong>${p.totalCitas}</strong> cita(s) · última: ${p.ultimaFecha}
+              <strong>${p.totalCitas}</strong> cita(s) · Última: ${p.ultimaFecha}
             </div>
           </div>
           ${p.notas.length ? `
@@ -834,7 +1375,7 @@
       `).join('');
     }
 
-    /* ---------- Utilidades ---------- */
+    /* ---------- SANITIZACIÓN HTML ---------- */
     function escapeHtml(str) {
       if (str === null || str === undefined) return '';
       return String(str)
